@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Operator | TeleSignal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .operators-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            flex-grow: 1;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .operators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .operator-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .operator-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .operator-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-jio {
+            background: #0077B6;
+        }
+
+        .logo-airtel {
+            background: #E63946;
+        }
+
+        .logo-vi {
+            background: #F4B400;
+            color: #000;
+        }
+
+        .logo-bsnl {
+            background: #008000;
+        }
+
+        .operator-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .operator-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-button {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .navbar {
+            padding: 1.5rem 2rem;
+            background: rgba(10, 10, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">TeleSignal</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="features.html">Features</a>
+            <a href="my-sights.html">My Sights</a>
+            <a href="operators.html" style="color: white; font-weight: bold;">Operators</a>
+        </div>
+        <div class="auth-buttons" id="authContainer">
+            <!-- Logged Out State -->
+            <div id="loggedOutButtons">
+                <a href="login.html" class="btn btn-primary" style="padding: 8px 16px;">Login</a>
+                <a href="signup.html" class="btn btn-outline"
+                    style="margin-left:10px; display:inline-block; padding: 8px 16px;">Sign Up</a>
+            </div>
+
+            <!-- Logged In State -->
+            <div id="loggedInProfile" style="display: none; align-items: center; gap: 10px;">
+                <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
+            </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" id="profileDropdown">
+            <!-- Dynamic Content -->
+            <div class="dropdown-item" onclick="window.location.href='dashboards/user-dashboard.html'">
+                <ion-icon name="grid-outline"></ion-icon> Dashboard
+            </div>
+            <div class="dropdown-item" onclick="window.handleLogout()">
+                <ion-icon name="log-out-outline"></ion-icon> Logout
+            </div>
+        </div>
+    </nav>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+    <div class="operators-container">
+        <header class="page-header">
+            <h1 class="page-title">Choose Your Network</h1>
+            <p class="page-subtitle">Select an operator to view detailed prepaid and postpaid plans</p>
+        </header>
+
+        <div class="operators-grid">
+            <!-- Jio -->
+            <a href="jio-plans.html" class="operator-card">
+                <div class="operator-logo logo-jio">Jio</div>
+                <h2 class="operator-name">Reliance Jio</h2>
+                <p class="operator-desc">Experience True 5G with India's largest digital network. Unlimited data and
+                    voice plans.</p>
+                <div class="cta-button">View Plans <span>→</span></div>
+            </a>
+
+            <!-- Airtel -->
+            <a href="airtel-plans.html" class="operator-card">
+                <div class="operator-logo logo-airtel">Airtel</div>
+                <h2 class="operator-name">Airtel</h2>
+                <p class="operator-desc">India's leading provider of prepaid & postpaid mobile services with 5G Plus.
+                </p>
+                <div class="cta-button">View Plans <span>→</span></div>
+            </a>
+
+            <!-- Vi -->
+            <a href="vi-plans.html" class="operator-card">
+                <div class="operator-logo logo-vi">Vi</div>
+                <h2 class="operator-name">Vodafone Idea</h2>
+                <p class="operator-desc">Together for tomorrow. Enjoy Hero Unlimited plans with weekend rollover.</p>
+                <div class="cta-button">View Plans <span>→</span></div>
+            </a>
+
+            <!-- BSNL -->
+            <a href="bsnl-plans.html" class="operator-card">
+                <div class="operator-logo logo-bsnl">BSNL</div>
+                <h2 class="operator-name">BSNL</h2>
+                <p class="operator-desc">Connecting India with affordable plans and widest rural coverage.</p>
+                <div class="cta-button">View Plans <span>→</span></div>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
