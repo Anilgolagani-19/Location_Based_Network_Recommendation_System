@@ -466,6 +466,12 @@ header {
         padding: 0.5rem;
         border-bottom: 1px solid var(--card-border);
         border-right: none;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        height: 4px;
     }
 
     .sidebar-item {
@@ -473,6 +479,7 @@ header {
         padding: 0.5rem 1rem;
         border-left: none;
         border-bottom: 3px solid transparent;
+        display: inline-block;
     }
 
     .sidebar-item.active {
@@ -482,5 +489,56 @@ header {
 
     .main-content {
         padding: 1rem;
+    }
+
+    /* Force Header adjustments */
+    header {
+        padding: 0.5rem 1rem !important;
+        height: auto !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .logo-section {
+        font-size: 1rem;
+    }
+
+    .hero-slider-compact {
+        height: 220px;
+        /* Smaller hero on mobile */
+    }
+
+    .hero-slide h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-slide p {
+        font-size: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Grid Adjustments */
+    .plans-grid-modern {
+        grid-template-columns: 1fr;
+        /* Stack plans */
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        /* Stack info cards */
+    }
+
+    .plan-card-modern {
+        max-width: 100%;
+    }
+
+    /* Adjust buttons in header */
+    .btn-recharge {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
     }
 }

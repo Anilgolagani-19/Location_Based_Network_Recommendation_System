@@ -307,6 +307,18 @@ body {
     margin-bottom: 30px;
 }
 
+@media (max-width: 1200px) {
+    .pbi-filter-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .pbi-filter-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .pbi-filter-box {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);

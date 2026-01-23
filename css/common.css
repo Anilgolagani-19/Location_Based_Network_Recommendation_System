@@ -107,6 +107,10 @@ ul {
     backdrop-filter: blur(10px);
 }
 
+.hamburger {
+    display: none;
+}
+
 .auth-buttons {
     display: flex;
     align-items: center;
@@ -597,12 +601,65 @@ html {
     /* Navigation */
     .navbar {
         padding: 15px 15px;
+        position: relative;
+        /* Ensure z-index works */
+    }
+
+    .hamburger {
+        display: block;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .bar {
+        display: block;
+        width: 25px;
+        height: 3px;
+        margin: 5px auto;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+        background-color: var(--text-main);
+    }
+
+    /* Hamburger Animation */
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
     }
 
     .nav-links {
-        gap: 15px;
-        font-size: 0.9rem;
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        /* Adjust based on navbar height */
+        gap: 0;
+        flex-direction: column;
+        background-color: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--glass-border);
     }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 16px 0;
+    }
+
 
     .logo {
         font-size: 1.3rem;
