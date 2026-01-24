@@ -69,37 +69,37 @@
                 </div>
             </div>
 
-            <!-- Power BI Style Filters & KPI Row -->
-            <div class="pbi-filter-row mb-4">
-                <!-- Column 1: State & City (Unified) -->
-                <div class="pbi-col">
-                    <div class="pbi-filter-box h-100">
+            <!-- Main Grid Layout (3 Rows x 2 Columns) -->
+            <div class="dashboard-grid">
+
+                <!-- ROW 1: FILTERS -->
+
+                <!-- Col 1: Primary Filters (State, City, Operator, Network) -->
+                <div class="grid-card filter-card-primary">
+                    <div class="card-header-custom">
+                        <i class="bi bi-funnel-fill me-2"></i> Primary Filters
+                    </div>
+                    <div class="filter-grid-2x2">
                         <div class="filter-group">
-                            <label class="pbi-label">state</label>
+                            <label class="pbi-label">State</label>
                             <select id="stateFilter" class="pbi-select">
                                 <option value="All">All</option>
                             </select>
                         </div>
-                        <div class="filter-group mt-3">
-                            <label class="pbi-label">city</label>
-                            <select id="cityFilter" class="pbi-select">
-                                <option value="All">All</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 2: Operator & Network Type (Unified) -->
-                <div class="pbi-col">
-                    <div class="pbi-filter-box h-100">
                         <div class="filter-group">
-                            <label class="pbi-label">operator</label>
+                            <label class="pbi-label">Operator</label>
                             <select id="operatorFilter" class="pbi-select">
                                 <option value="All">All</option>
                             </select>
                         </div>
-                        <div class="filter-group mt-3">
-                            <label class="pbi-label">network_type</label>
+                        <div class="filter-group">
+                            <label class="pbi-label">City</label>
+                            <select id="cityFilter" class="pbi-select">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="pbi-label">Network Type</label>
                             <select id="networkFilter" class="pbi-select">
                                 <option value="All">All</option>
                             </select>
@@ -107,114 +107,168 @@
                     </div>
                 </div>
 
-                <!-- Column 3: Pincode -->
-                <div class="pbi-col">
-                    <div class="pbi-filter-box h-100">
-                        <label class="pbi-label">area</label>
-                        <select id="areaFilter" class="pbi-select mb-2">
-                            <option value="All">All</option>
-                        </select>
-                        <label class="pbi-label">pincode</label>
-                        <div class="pincode-search-container">
-                            <input type="text" id="pincodeSearch" class="pincode-search-input"
-                                placeholder="Search pincode...">
-                            <i class="bi bi-search pincode-search-icon"></i>
-                        </div>
-                        <div class="pincode-list-container">
-                            <select id="pincodeFilter" class="pbi-select-multi" size="5">
-                                <option value="All">All</option>
-                            </select>
-                        </div>
+                <!-- Col 2: Secondary Filters (Area, Pincode, Year, Month) -->
+                <div class="grid-card filter-card-secondary">
+                    <div class="card-header-custom">
+                        <i class="bi bi-sliders me-2"></i> Granular Controls
                     </div>
-                </div>
-
-                <!-- Column 4: Year Tiles -->
-                <div class="pbi-col">
-                    <div class="pbi-filter-box h-100">
-                        <label class="pbi-label">year</label>
-                        <div id="year-filters" class="pbi-year-grid">
-                            <!-- Filled by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 5: Month Slider -->
-                <div class="pbi-col">
-                    <div class="pbi-filter-box h-100">
-                        <label class="pbi-label">month</label>
-                        <div class="pbi-month-container">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="small">1</span>
-                                <span class="small" id="month-val">12</span>
+                    <div class="filter-flex-row">
+                        <!-- Area & Pincode -->
+                        <div class="filter-subgroup flex-grow-1">
+                            <div class="mb-2">
+                                <label class="pbi-label">Area</label>
+                                <select id="areaFilter" class="pbi-select">
+                                    <option value="All">All</option>
+                                </select>
                             </div>
-                            <input type="range" class="form-range pbi-range" id="monthFilter" min="1" max="12"
-                                value="12">
+                            <div>
+                                <label class="pbi-label">Pincode</label>
+                                <div class="pincode-search-container">
+                                    <input type="text" id="pincodeSearch" class="pincode-search-input"
+                                        placeholder="Search pincode...">
+                                    <i class="bi bi-search pincode-search-icon"></i>
+                                </div>
+                                <div class="pincode-list-container">
+                                    <select id="pincodeFilter" class="pbi-select-multi" size="3">
+                                        <option value="All">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Year & Month -->
+                        <div class="filter-subgroup flex-grow-1 border-start-custom ps-3">
+                            <label class="pbi-label">Year</label>
+                            <div id="year-filters" class="pbi-year-grid mb-3">
+                                <!-- Filled by JS -->
+                            </div>
+
+                            <label class="pbi-label">Month: <span id="month-val" class="text-primary">12</span></label>
+                            <div class="pbi-month-container">
+                                <div class="d-flex justify-content-between text-muted x-small">
+                                    <span>1</span>
+                                    <span>12</span>
+                                </div>
+                                <input type="range" class="form-range pbi-range" id="monthFilter" min="1" max="12"
+                                    value="12">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Column 6: Main KPI -->
-                <div class="pbi-col">
-                    <div class="pbi-kpi-tile h-100">
-                        <div class="pbi-kpi-value" id="main-kpi-upload">0.00</div>
-                        <div class="pbi-kpi-label">Average of upload_mbps</div>
+                <!-- ROW 2: REVENUE KPI CARDS (NEW) -->
+                <!-- Col 1: Daily Revenue -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper"
+                            style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="kpi-daily-revenue">0</div>
+                            <div class="pbi-kpi-label">Daily Revenue Generated</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Main Content Area (Charts) -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">Average Download Speed by Operator (Peak vs Non-Peak)</div>
-                        <div class="chart-container">
-                            <canvas id="chartDownloadOp"></canvas>
+                <!-- Col 2: Subscription Count -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper"
+                            style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="kpi-subscription-count">0</div>
+                            <div class="pbi-kpi-label">Active Operator Subscriptions</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">Avg Latency by city and network_type</div>
-                        <div class="chart-container">
-                            <canvas id="chartLatencyCity"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">4G vs 5G Coverage Growth Over Years</div>
-                        <div class="chart-container">
-                            <canvas id="chartCoverageGrowth"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">Avg Download Speed by year and operator</div>
-                        <div class="chart-container">
-                            <canvas id="chartDownloadYear"></canvas>
+                <!-- ROW 3: EXISTING KPI CARDS -->
+
+                <!-- Col 1: Upload Speed KPI -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper icon-upload">
+                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="main-kpi-upload">26.59</div>
+                            <div class="pbi-kpi-label">Average of upload_mbps</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">Avg Latency by year and is_peak_hour</div>
-                        <div class="chart-container">
-                            <canvas id="chartLatencyYear"></canvas>
+
+                <!-- Col 2: Download Speed KPI -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper icon-download">
+                            <i class="bi bi-cloud-arrow-down-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value">45.20</div>
+                            <div class="pbi-kpi-label">Average of download_mbps</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="pbi-chart-card">
-                        <div class="pbi-chart-title">Average Final Network Score by Operator</div>
-                        <div class="chart-container">
-                            <canvas id="chartScoreOp"></canvas>
-                        </div>
+
+                <!-- ROW 4: CHARTS & ANALYTICS -->
+
+                <!-- 1. Revenue -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Revenue Analytics (Daily/Monthly/Yearly)
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartRevenue"></canvas>
                     </div>
                 </div>
+
+                <!-- 2. Avg Download Speed by Operator -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Average Download Speed by Operator (Peak vs Non-Peak)
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartDownloadOp"></canvas>
+                    </div>
+                </div>
+
+                <!-- 3. Avg Latency by City -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Avg Latency by City and Network Type
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartLatencyCity"></canvas>
+                    </div>
+                </div>
+
+                <!-- 4. Coverage Growth -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">4G vs 5G Coverage Growth</div>
+                    <div class="chart-container-custom"><canvas id="chartCoverageGrowth"></canvas></div>
+                </div>
+
+                <!-- 5. Network Score -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">Network Score</div>
+                    <div class="chart-container-custom"><canvas id="chartScoreOp"></canvas></div>
+                </div>
+
+                <!-- 6. Latency Trends -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">Latency Trends</div>
+                    <div class="chart-container-custom"><canvas id="chartLatencyYear"></canvas></div>
+                </div>
+
+                <!-- 7. BIG CHART: Avg Download Speed Trend -->
+                <div class="grid-card chart-card-custom" style="grid-column: 1 / -1;">
+                    <div class="card-header-custom">Avg Download Speed Trend</div>
+                    <div class="chart-container-custom"><canvas id="chartDownloadYear"></canvas></div>
+                </div>
+
             </div>
 
         </div>
@@ -225,88 +279,83 @@
                 <h1 class="dashboard-title">My Insights – User Behavior & Conversion Analytics</h1>
             </div>
 
-            <!-- KPIs -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-total-users">0</div>
-                        <div class="kpi-label">Total Users</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-avg-session">0s</div>
-                        <div class="kpi-label">Avg Session Time</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-location-sub">0</div>
-                        <div class="kpi-label">Location Submissions</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-more-clicks">0</div>
-                        <div class="kpi-label">More Clicks (Views)</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-plan-views">0</div>
-                        <div class="kpi-label">Plan Views</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpi-get-sim">0</div>
-                        <div class="kpi-label">Get SIM Clicks</div>
-                    </div>
-                </div>
-            </div>
+            <!-- Main Layout Container -->
+            <div class="sights-layout">
 
-            <!-- Charts Row 1 -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <div class="chart-title">User Journey Conversion Funnel</div>
-                        <canvas id="chartFunnel"></canvas>
+                <!-- ROW 1: KPI GRID (2 Rows x 3 Cols) -->
+                <div class="kpi-grid-container mb-4">
+                    <!-- Row 1 of KPIs -->
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-total-users">0</div>
+                        <div class="kpi-label-modern">Total Users</div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <div class="chart-title">Average Session Duration Over Time</div>
-                        <canvas id="chartSessionTrend"></canvas>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-avg-session">0s</div>
+                        <div class="kpi-label-modern">Avg Session Time</div>
                     </div>
-                </div>
-            </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-location-sub">0</div>
+                        <div class="kpi-label-modern">Location Submissions</div>
+                    </div>
 
-            <!-- Charts Row 2 -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <div class="chart-title">Operator-wise Plan Views</div>
-                        <canvas id="chartOpPlanViews"></canvas>
+                    <!-- Row 2 of KPIs -->
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-more-clicks">0</div>
+                        <div class="kpi-label-modern">More Clicks (Views)</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-plan-views">0</div>
+                        <div class="kpi-label-modern">Plan Views</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-get-sim">0</div>
+                        <div class="kpi-label-modern">Get SIM Clicks</div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <div class="chart-title">Operator-wise Get SIM Clicks</div>
-                        <canvas id="chartOpGetSim"></canvas>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Boost Section -->
-            <div class="boost-section">
-                <div>
-                    <h3>Partner with TeleSignal</h3>
-                    <p class="mb-0" style="opacity: 0.9;">Boost your operator visibility and gain premium insights into
-                        user network preferences.</p>
+                <!-- ROW 2: CHARTS (2 Columns) -->
+                <div class="charts-grid-2col mb-4">
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">User Journey Conversion Funnel</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartFunnel"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Average Session Duration Over Time</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartSessionTrend"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <button class="boost-btn" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
-                    <i class="bi bi-rocket-takeoff-fill me-2"></i> Tie up & Boost
-                </button>
+
+                <!-- ROW 3: Extra Charts (Optional/Existing) -->
+                <div class="charts-grid-2col mb-4">
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Operator-wise Plan Views</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartOpPlanViews"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Operator-wise Get SIM Clicks</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartOpGetSim"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boost Section -->
+                <div class="boost-section-modern">
+                    <div class="boost-content">
+                        <h3>Partner with TeleSignal</h3>
+                        <p>Boost your operator visibility and gain premium insights into user network preferences.</p>
+                    </div>
+                    <button class="boost-btn-modern" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
+                        <i class="bi bi-rocket-takeoff-fill me-2"></i> Tie up & Boost
+                    </button>
+                </div>
+
             </div>
         </div>
 

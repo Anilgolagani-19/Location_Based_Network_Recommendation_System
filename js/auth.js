@@ -458,4 +458,3 @@ function parseAuthError(code) {
         default: return "Authentication failed. See console.";
     }
 }
-
