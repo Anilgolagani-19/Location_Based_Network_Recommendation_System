@@ -71,8 +71,8 @@ function handleAuthRedirect(userEmail) {
         console.log(`[Auth] Redirecting to Dashboard: ${isAdmin ? 'Admin' : 'Operator'}`);
         window.location.href = `${pathPrefix}admin-dashboard.html`;
     } else {
-        console.log("[Auth] Redirecting to User Dashboard");
-        window.location.href = `${pathPrefix}user-dashboard.html`;
+        console.log("[Auth] Redirecting to User Filters");
+        window.location.href = `${pathPrefix}user-filters.html`;
     }
 }
 

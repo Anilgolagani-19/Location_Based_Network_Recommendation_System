@@ -1,3 +1,6 @@
+// Import Analytics for My Insights view
+import { analytics } from './analytics.js';
+
 export default class AdminDashboardController {
     constructor() {
         this.service = window.telecomDataService;
@@ -160,37 +163,6 @@ export default class AdminDashboardController {
             if (overlay) overlay.style.display = 'none';
         }
     }
-
-    // ... (Filter methods remain unchanged, skipping for brevity in replacement but preserved in structure) ...
-    // NOTE: In a real "replace", I would need to include the filter methods if I replaced the whole class. 
-    // Since I'm using "replace_file_content" on a range or the whole file, I will just ensure the NEW methods are added.
-    // However, to keep it clean and robust, I will assume I am replacing the Constructor + Init + Adding new methods, 
-    // and I'll preserve existing logical flow. 
-
-    /* 
-       For this specific tool usage, I will replace the BEGINNING of the file (Constructor/Change Init) 
-       and ADD the new Revenue Chart methods. 
-       Actually, I need to be careful not to delete `initFilters` etc.
-       I will use multiple chunks if I could, but `replace_file_content` is single chunk.
-       I'll use `multi_replace_file_content` is safer for insertion, but here I'm using `replace_file_content` 
-       Wait, I should probably replace the whole logical block or append. 
-       
-       Let's stick to replacing the `constructor` and `init` first.
-       And then I'll add the chart rendering method.
-       
-       Actually, I will select the entire file content to be safe and ensure everything is there, 
-       OR I can just act on specific parts.
-       
-       Let's use `multi_replace_file_content` to surgically update specific parts.
-       1. Update Constructor & Init
-       2. Add `renderRevenueChart`
-       3. Update `handlePayment`
-    */
-
-    // RE-PLANNING: I will use `replace_file_content` on the class to overwrite it with the new version including all methods.
-    // Since the file is small enough (750 lines), I can rewrite most of it or targeted sections.
-    // Actually, let's just use `multi_replace_file_content` on existing blocks.
-
 
     initFilters() {
         const options = this.service.getFilterOptions();
