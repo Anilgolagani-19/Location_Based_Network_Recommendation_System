@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Your Network | TeleSignal</title>
     <link rel="stylesheet" href="../css/userdashboard.css">
+    <link rel="stylesheet" href="../css/location-ui.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,6 +169,18 @@
                 <p>Select your location to get personalized operator recommendations and plans.</p>
             </div>
 
+            <!-- Location Status (hidden by default) -->
+            <div id="locationStatus" class="location-status" style="display: none;">
+                <i class="bi bi-info-circle"></i>
+                <span id="locationStatusText"></span>
+            </div>
+
+            <!-- Use My Location Button -->
+            <button type="button" class="use-location-btn" id="useLocationBtn">
+                <i class="bi bi-geo-alt-fill"></i>
+                Use My Location
+            </button>
+
             <form id="filterForm" class="filter-form">
                 <div class="filter-group">
                     <label class="filter-label">State</label>
@@ -219,6 +232,9 @@
         </div>
     </div>
 
+    <!-- Location Service -->
+    <script src="../js/location-service.js"></script>
+
     <!-- Data Service and Logic -->
     <script src="../js/data-processor.js"></script>
     <!-- Import Analytics (as module) is tricky if this isn't a module script. Let's make it a module. -->
@@ -237,8 +253,83 @@
             const pincodeSearch = document.getElementById('pincodeSearch');
             const networkSelect = document.getElementById('filter-network');
             const form = document.getElementById('filterForm');
+            const useLocationBtn = document.getElementById('useLocationBtn');
+            const locationStatus = document.getElementById('locationStatus');
+            const locationStatusText = document.getElementById('locationStatusText');
 
             let allPincodes = [];
+
+            // Location Detection Handler
+            if (useLocationBtn) {
+                useLocationBtn.addEventListener('click', async () => {
+                    // Disable button
+                    useLocationBtn.disabled = true;
+                    useLocationBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Detecting...';
+
+                    // Show status
+                    locationStatus.style.display = 'flex';
+                    locationStatus.className = 'location-status detecting';
+                    locationStatusText.textContent = 'Detecting your location...';
+
+                    try {
+                        const result = await locationService.detectAndMatchLocation(dataProcessor);
+
+                        if (result.success) {
+                            // Success - auto-populate filters
+                            locationStatus.className = 'location-status success';
+                            locationStatusText.textContent = `Location detected: ${result.detectedLocation.city}`;
+
+                            // Apply filters
+                            if (result.location.state && result.location.state !== 'All') {
+                                stateSelect.value = result.location.state;
+                                dataProcessor.filters.state = result.location.state;
+
+                                // Populate cities
+                                const cities = dataProcessor.getCitiesForState(result.location.state);
+                                populateDropdown(citySelect, cities, 'All Cities');
+                            }
+
+                            if (result.location.city && result.location.city !== 'All') {
+                                citySelect.value = result.location.city;
+                                dataProcessor.filters.city = result.location.city;
+
+                                // Populate areas
+                                const areas = dataProcessor.getAreasForCity(result.location.city);
+                                populateDropdown(areaSelect, areas, 'All Areas');
+                            }
+
+                            // Auto-submit after 1.5 seconds
+                            setTimeout(() => {
+                                form.dispatchEvent(new Event('submit'));
+                            }, 1500);
+
+                        } else {
+                            // Error handling
+                            locationStatus.className = 'location-status error';
+
+                            if (result.error === 'permission_denied') {
+                                locationStatusText.textContent = 'Location permission denied. Please enable in browser settings.';
+                            } else if (result.error === 'location_not_available') {
+                                locationStatusText.textContent = `Service not available in ${result.detectedLocation?.city || 'your area'}.`;
+                            } else {
+                                locationStatusText.textContent = 'Unable to detect location. Please try again.';
+                            }
+
+                            // Re-enable button
+                            useLocationBtn.disabled = false;
+                            useLocationBtn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> Try Again';
+                        }
+
+                    } catch (error) {
+                        console.error('Location detection error:', error);
+                        locationStatus.className = 'location-status error';
+                        locationStatusText.textContent = 'Location detection failed. Please select manually.';
+
+                        useLocationBtn.disabled = false;
+                        useLocationBtn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> Try Again';
+                    }
+                });
+            }
 
             // Load initial data
             await dataProcessor.loadData();

@@ -27,21 +27,31 @@ class DashboardController {
             // Initialize filter elements
             this.initializeFilters();
 
-            // Handle URL Parameters (from user-filters.html)
-            this.handleUrlParameters();
+            // Check if we should attempt location detection (mobile only, no saved filters)
+            const shouldDetectLocation = locationService.isMobileDevice() &&
+                !localStorage.getItem('dashboardFilters') &&
+                !window.location.search;
 
-            // Initialize all components
-            mapManager.initializeMap();
-            chartManager.initializeCharts();
-            tableManager.initializeTable();
+            if (shouldDetectLocation) {
+                // Attempt location detection
+                await this.initializeLocationDetection();
+            } else {
+                // Handle URL Parameters (from user-filters.html)
+                this.handleUrlParameters();
 
-            // Initial data load
-            this.updateDashboard();
+                // Initialize all components
+                mapManager.initializeMap();
+                chartManager.initializeCharts();
+                tableManager.initializeTable();
 
-            // Setup profile dropdown toggle
-            this.setupProfileDropdown();
+                // Initial data load
+                this.updateDashboard();
 
-            this.isInitialized = true;
+                // Setup profile dropdown toggle
+                this.setupProfileDropdown();
+
+                this.isInitialized = true;
+            }
 
         } catch (error) {
             console.error('Error initializing dashboard:', error);
@@ -208,6 +218,173 @@ class DashboardController {
             }
         }
     }
+
+    // Initialize location detection for mobile users
+    async initializeLocationDetection() {
+        console.log('[Dashboard] Starting location detection...');
+
+        // Show detecting state
+        this.showLocationMessage('detecting');
+
+        try {
+            // Attempt to detect and match location
+            const result = await locationService.detectAndMatchLocation(dataProcessor);
+
+            if (result.success) {
+                // Location detected and matched
+                console.log('[Dashboard] Location matched:', result.location);
+
+                // Apply filters
+                Object.keys(result.location).forEach(key => {
+                    dataProcessor.updateFilter(key, result.location[key]);
+                    if (this.filterElements[key]) {
+                        this.filterElements[key].value = result.location[key];
+                    }
+                });
+
+                // Save to localStorage
+                localStorage.setItem('dashboardFilters', JSON.stringify(result.location));
+
+                // Show success message briefly
+                this.showLocationMessage('success', result.detectedLocation);
+
+                // Hide overlay and show dashboard after 2 seconds
+                setTimeout(() => {
+                    this.hideLocationOverlay();
+                    this.finalizeDashboardInitialization();
+                }, 2000);
+
+            } else {
+                // Handle different error types
+                if (result.error === 'permission_denied') {
+                    this.showLocationMessage('permission_denied');
+                } else if (result.error === 'location_not_available') {
+                    this.showLocationMessage('not_available', result.detectedLocation);
+                } else {
+                    this.showLocationMessage('error');
+                }
+            }
+
+        } catch (error) {
+            console.error('[Dashboard] Location detection failed:', error);
+            this.showLocationMessage('error');
+        }
+    }
+
+    // Finalize dashboard initialization (after location detection or skip)
+    finalizeDashboardInitialization() {
+        // Handle URL Parameters (from user-filters.html)
+        this.handleUrlParameters();
+
+        // Initialize all components
+        mapManager.initializeMap();
+        chartManager.initializeCharts();
+        tableManager.initializeTable();
+
+        // Initial data load
+        this.updateDashboard();
+
+        // Setup profile dropdown toggle
+        this.setupProfileDropdown();
+
+        this.isInitialized = true;
+    }
+
+    // Show location message overlay
+    showLocationMessage(state, locationInfo = null) {
+        const overlay = document.getElementById('locationOverlay');
+        const card = document.getElementById('locationMessageCard');
+
+        if (!overlay || !card) return;
+
+        // Remove all state classes
+        card.className = 'location-message-card';
+        card.classList.add(`location-state-${state}`);
+
+        let content = '';
+
+        switch (state) {
+            case 'detecting':
+                content = `
+                    <div class="location-spinner"></div>
+                    <h2 class="location-message-title">Detecting Your Location</h2>
+                    <p class="location-message-text">Please allow location access to view network data for your area.</p>
+                `;
+                break;
+
+            case 'permission_denied':
+                content = `
+                    <div class="location-icon">🔒</div>
+                    <h2 class="location-message-title">Location Access Required</h2>
+                    <p class="location-message-text">Please enable location access in your browser settings to view your dashboard.</p>
+                    <button class="location-btn" onclick="dashboardController.retryLocationDetection()">
+                        <i class="bi bi-arrow-clockwise"></i> Try Again
+                    </button>
+                    <button class="location-btn secondary" onclick="dashboardController.skipToManualSelection()">
+                        Select Manually
+                    </button>
+                `;
+                break;
+
+            case 'not_available':
+                const cityName = locationInfo ? locationInfo.city : 'your location';
+                content = `
+                    <div class="location-icon">📍</div>
+                    <h2 class="location-message-title">Service Not Available</h2>
+                    <p class="location-message-text">We detected you're in ${cityName}, but our service is not available in your area yet.</p>
+                    <button class="location-btn" onclick="dashboardController.skipToManualSelection()">
+                        Select Different Location
+                    </button>
+                `;
+                break;
+
+            case 'error':
+                content = `
+                    <div class="location-icon">⚠️</div>
+                    <h2 class="location-message-title">Unable to Detect Location</h2>
+                    <p class="location-message-text">We couldn't detect your location. Please try again or select manually.</p>
+                    <button class="location-btn" onclick="dashboardController.retryLocationDetection()">
+                        <i class="bi bi-arrow-clockwise"></i> Retry
+                    </button>
+                    <button class="location-btn secondary" onclick="dashboardController.skipToManualSelection()">
+                        Select Manually
+                    </button>
+                `;
+                break;
+
+            case 'success':
+                const detectedCity = locationInfo ? locationInfo.city : 'your area';
+                content = `
+                    <div class="location-icon">✅</div>
+                    <h2 class="location-message-title">Location Detected!</h2>
+                    <p class="location-message-text">Loading dashboard for ${detectedCity}...</p>
+                `;
+                break;
+        }
+
+        card.innerHTML = content;
+        overlay.classList.add('active');
+    }
+
+    // Hide location overlay
+    hideLocationOverlay() {
+        const overlay = document.getElementById('locationOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    }
+
+    // Retry location detection
+    async retryLocationDetection() {
+        locationService.reset();
+        await this.initializeLocationDetection();
+    }
+
+    // Skip to manual selection (redirect to filters page)
+    skipToManualSelection() {
+        window.location.href = 'user-filters.html';
+    }
+
 
     // Populate state filter
     populateStateFilter() {

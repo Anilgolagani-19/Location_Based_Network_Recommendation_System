@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/userdashboard.css">
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/theme-fix.css">
+    <link rel="stylesheet" href="../css/location-ui.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +23,13 @@
 </head>
 
 <body>
+    <!-- Location Detection Overlay -->
+    <div class="location-overlay" id="locationOverlay">
+        <div class="location-message-card" id="locationMessageCard">
+            <!-- Content will be dynamically updated by JavaScript -->
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-brand">
@@ -226,6 +234,9 @@
 
     <!-- Authentication Module -->
     <script type="module" src="../js/auth.js"></script>
+
+    <!-- Location Service -->
+    <script src="../js/location-service.js"></script>
 
     <!-- JavaScript Modules -->
     <script src="../js/data-processor.js"></script>

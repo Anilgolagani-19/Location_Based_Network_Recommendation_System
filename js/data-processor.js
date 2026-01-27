@@ -135,6 +135,12 @@ class DataProcessor {
         return areas.sort();
     }
 
+    // Get state for a given city (for location service)
+    getStateForCity(city) {
+        const match = this.rawData.find(r => r.city === city);
+        return match ? match.state : null;
+    }
+
     // Get pincodes for selected area
     // Get pincodes for selected area or higher-level context
     // Get pincodes for selected area or higher-level context
