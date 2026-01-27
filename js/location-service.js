@@ -250,8 +250,7 @@ class LocationService {
     }
 
     /**
-     * Complete location detection flow with STRICT validation
-     * Requires: City + Area + Pincode to be found in database
+     * Complete location detection flow
      * Returns matched location data ready for dashboard filters
      */
     async detectAndMatchLocation(dataProcessor) {
@@ -272,9 +271,8 @@ class LocationService {
                 return {
                     success: false,
                     error: 'incomplete_detection',
-                    message: 'Unable to detect complete location details. Please try again.',
-                    detectedLocation: locationInfo,
-                    missingFields: ['city']
+                    message: 'Unable to detect your city. Please select manually.',
+                    detectedLocation: locationInfo
                 };
             }
 
@@ -286,36 +284,24 @@ class LocationService {
                 return {
                     success: false,
                     error: 'city_not_available',
-                    message: 'Service not available for your current location.',
-                    detectedLocation: locationInfo,
-                    missingFields: ['city']
+                    message: `Service not available in ${locationInfo.city}. Please select from available cities.`,
+                    detectedLocation: locationInfo
                 };
             }
 
             // Step 5: Get state for the matched city
             const stateForCity = dataProcessor.getStateForCity(matchedCity);
 
-            // Step 6: CRITICAL - Match Area and Pincode
+            // Step 6: Try to match Area and Pincode (OPTIONAL)
             // Get all records for this city
             const cityRecords = dataProcessor.rawData.filter(r => r.city === matchedCity);
 
-            if (cityRecords.length === 0) {
-                return {
-                    success: false,
-                    error: 'city_data_not_available',
-                    message: 'Data not available for your area or pincode.',
-                    detectedLocation: locationInfo,
-                    matchedCity: matchedCity,
-                    missingFields: ['area', 'pincode']
-                };
-            }
-
             // Try to match area and pincode from detected location
-            let matchedArea = null;
+            let matchedArea = 'All';
             let matchedPincode = null;
 
             // If we have a pincode from geocoding, try to find exact match
-            if (locationInfo.pincode) {
+            if (locationInfo.pincode && cityRecords.length > 0) {
                 const pincodeMatch = cityRecords.find(r =>
                     r.pincode && r.pincode.toString() === locationInfo.pincode.toString()
                 );
@@ -328,7 +314,7 @@ class LocationService {
             }
 
             // If no pincode match, try to find closest area based on coordinates
-            if (!matchedArea || !matchedPincode) {
+            if (matchedArea === 'All' && cityRecords.length > 0) {
                 // Find the closest area by calculating distance
                 const closest = this.findClosestArea(coords, cityRecords);
 
@@ -339,23 +325,7 @@ class LocationService {
                 }
             }
 
-            // STRICT VALIDATION: All three must be present
-            if (!matchedArea || !matchedPincode) {
-                const missingFields = [];
-                if (!matchedArea) missingFields.push('area');
-                if (!matchedPincode) missingFields.push('pincode');
-
-                return {
-                    success: false,
-                    error: 'incomplete_data',
-                    message: 'Data not available for your area or pincode.',
-                    detectedLocation: locationInfo,
-                    matchedCity: matchedCity,
-                    missingFields: missingFields
-                };
-            }
-
-            // SUCCESS: All three levels matched
+            // SUCCESS: City matched (area and pincode are optional)
             return {
                 success: true,
                 location: {
@@ -363,7 +333,7 @@ class LocationService {
                     city: matchedCity,
                     area: matchedArea,
                     network: 'All',
-                    pincode: matchedPincode.toString()
+                    pincode: matchedPincode ? matchedPincode.toString() : null
                 },
                 detectedLocation: locationInfo,
                 coords: coords,
