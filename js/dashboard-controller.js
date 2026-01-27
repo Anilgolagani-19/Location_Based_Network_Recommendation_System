@@ -258,9 +258,17 @@ class DashboardController {
                 // Handle different error types
                 if (result.error === 'permission_denied') {
                     this.showLocationMessage('permission_denied');
-                } else if (result.error === 'location_not_available') {
-                    this.showLocationMessage('not_available', result.detectedLocation);
+                } else if (result.error === 'incomplete_detection') {
+                    // GPS detected but couldn't get city from geocoding
+                    this.showLocationMessage('incomplete_detection');
+                } else if (result.error === 'city_not_available') {
+                    // City detected but not in database
+                    this.showLocationMessage('city_not_available', result.detectedLocation);
+                } else if (result.error === 'incomplete_data' || result.error === 'city_data_not_available') {
+                    // City found but area/pincode not available
+                    this.showLocationMessage('incomplete_data', result.detectedLocation, result.matchedCity, result.missingFields);
                 } else {
+                    // Generic error
                     this.showLocationMessage('error');
                 }
             }
@@ -291,7 +299,7 @@ class DashboardController {
     }
 
     // Show location message overlay
-    showLocationMessage(state, locationInfo = null) {
+    showLocationMessage(state, locationInfo = null, matchedCity = null, missingFields = null) {
         const overlay = document.getElementById('locationOverlay');
         const card = document.getElementById('locationMessageCard');
 
@@ -316,7 +324,7 @@ class DashboardController {
                 content = `
                     <div class="location-icon">🔒</div>
                     <h2 class="location-message-title">Location Access Required</h2>
-                    <p class="location-message-text">Please enable location access in your browser settings to view your dashboard.</p>
+                    <p class="location-message-text">Please enable location access to view location-based dashboard data.</p>
                     <button class="location-btn" onclick="dashboardController.retryLocationDetection()">
                         <i class="bi bi-arrow-clockwise"></i> Try Again
                     </button>
@@ -326,12 +334,40 @@ class DashboardController {
                 `;
                 break;
 
-            case 'not_available':
+            case 'incomplete_detection':
+                content = `
+                    <div class="location-icon">⚠️</div>
+                    <h2 class="location-message-title">Unable to Detect Complete Location Details</h2>
+                    <p class="location-message-text">We couldn't determine your city from GPS. Please try again.</p>
+                    <button class="location-btn" onclick="dashboardController.retryLocationDetection()">
+                        <i class="bi bi-arrow-clockwise"></i> Retry
+                    </button>
+                    <button class="location-btn secondary" onclick="dashboardController.skipToManualSelection()">
+                        Select Manually
+                    </button>
+                `;
+                break;
+
+            case 'city_not_available':
                 const cityName = locationInfo ? locationInfo.city : 'your location';
                 content = `
                     <div class="location-icon">📍</div>
                     <h2 class="location-message-title">Service Not Available</h2>
                     <p class="location-message-text">We detected you're in ${cityName}, but our service is not available in your area yet.</p>
+                    <button class="location-btn" onclick="dashboardController.skipToManualSelection()">
+                        Select Different Location
+                    </button>
+                `;
+                break;
+
+            case 'incomplete_data':
+                const detectedCityName = locationInfo ? locationInfo.city : matchedCity || 'your city';
+                const missing = missingFields && missingFields.length > 0 ? missingFields.join(' or ') : 'area or pincode';
+                content = `
+                    <div class="location-icon">📊</div>
+                    <h2 class="location-message-title">Data Not Available</h2>
+                    <p class="location-message-text">We found ${detectedCityName}, but data for your ${missing} is not available in our database.</p>
+                    <p class="location-message-text" style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Dashboard requires complete location data (city + area + pincode) to display analytics.</p>
                     <button class="location-btn" onclick="dashboardController.skipToManualSelection()">
                         Select Different Location
                     </button>

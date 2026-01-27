@@ -250,7 +250,8 @@ class LocationService {
     }
 
     /**
-     * Complete location detection flow
+     * Complete location detection flow with STRICT validation
+     * Requires: City + Area + Pincode to be found in database
      * Returns matched location data ready for dashboard filters
      */
     async detectAndMatchLocation(dataProcessor) {
@@ -266,33 +267,111 @@ class LocationService {
             const locationInfo = await this.reverseGeocode(coords.latitude, coords.longitude);
             console.log('[Location] Location info:', locationInfo);
 
-            // Step 4: Match against database
+            // Check if we got basic location data from geocoding
+            if (!locationInfo.city) {
+                return {
+                    success: false,
+                    error: 'incomplete_detection',
+                    message: 'Unable to detect complete location details. Please try again.',
+                    detectedLocation: locationInfo,
+                    missingFields: ['city']
+                };
+            }
+
+            // Step 4: Match city against database
             const availableCities = dataProcessor.getUniqueValues('city');
             const matchedCity = this.matchLocationToDatabase(locationInfo, availableCities);
 
             if (!matchedCity) {
                 return {
                     success: false,
-                    error: 'location_not_available',
+                    error: 'city_not_available',
                     message: 'Service not available for your current location.',
-                    detectedLocation: locationInfo
+                    detectedLocation: locationInfo,
+                    missingFields: ['city']
                 };
             }
 
             // Step 5: Get state for the matched city
             const stateForCity = dataProcessor.getStateForCity(matchedCity);
 
+            // Step 6: CRITICAL - Match Area and Pincode
+            // Get all records for this city
+            const cityRecords = dataProcessor.rawData.filter(r => r.city === matchedCity);
+
+            if (cityRecords.length === 0) {
+                return {
+                    success: false,
+                    error: 'city_data_not_available',
+                    message: 'Data not available for your area or pincode.',
+                    detectedLocation: locationInfo,
+                    matchedCity: matchedCity,
+                    missingFields: ['area', 'pincode']
+                };
+            }
+
+            // Try to match area and pincode from detected location
+            let matchedArea = null;
+            let matchedPincode = null;
+
+            // If we have a pincode from geocoding, try to find exact match
+            if (locationInfo.pincode) {
+                const pincodeMatch = cityRecords.find(r =>
+                    r.pincode && r.pincode.toString() === locationInfo.pincode.toString()
+                );
+
+                if (pincodeMatch) {
+                    matchedArea = pincodeMatch.area;
+                    matchedPincode = pincodeMatch.pincode;
+                    console.log('[Location] Exact pincode match found:', matchedPincode, matchedArea);
+                }
+            }
+
+            // If no pincode match, try to find closest area based on coordinates
+            if (!matchedArea || !matchedPincode) {
+                // Find the closest area by calculating distance
+                const closest = this.findClosestArea(coords, cityRecords);
+
+                if (closest) {
+                    matchedArea = closest.area;
+                    matchedPincode = closest.pincode;
+                    console.log('[Location] Closest area match:', matchedArea, matchedPincode);
+                }
+            }
+
+            // STRICT VALIDATION: All three must be present
+            if (!matchedArea || !matchedPincode) {
+                const missingFields = [];
+                if (!matchedArea) missingFields.push('area');
+                if (!matchedPincode) missingFields.push('pincode');
+
+                return {
+                    success: false,
+                    error: 'incomplete_data',
+                    message: 'Data not available for your area or pincode.',
+                    detectedLocation: locationInfo,
+                    matchedCity: matchedCity,
+                    missingFields: missingFields
+                };
+            }
+
+            // SUCCESS: All three levels matched
             return {
                 success: true,
                 location: {
                     state: stateForCity || 'All',
                     city: matchedCity,
-                    area: 'All',
+                    area: matchedArea,
                     network: 'All',
-                    pincode: 'All'
+                    pincode: matchedPincode.toString()
                 },
                 detectedLocation: locationInfo,
-                coords: coords
+                coords: coords,
+                matchDetails: {
+                    city: matchedCity,
+                    area: matchedArea,
+                    pincode: matchedPincode
+                }
             };
 
         } catch (error) {
@@ -305,6 +384,66 @@ class LocationService {
                 permissionStatus: this.permissionStatus
             };
         }
+    }
+
+    /**
+     * Find closest area based on GPS coordinates
+     * Uses Haversine formula to calculate distance
+     */
+    findClosestArea(coords, cityRecords) {
+        if (!cityRecords || cityRecords.length === 0) return null;
+
+        let closestRecord = null;
+        let minDistance = Infinity;
+
+        cityRecords.forEach(record => {
+            if (record.latitude && record.longitude) {
+                const distance = this.calculateDistance(
+                    coords.latitude,
+                    coords.longitude,
+                    record.latitude,
+                    record.longitude
+                );
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRecord = record;
+                }
+            }
+        });
+
+        // Only return if within reasonable distance (e.g., 5km)
+        if (closestRecord && minDistance < 5) {
+            return closestRecord;
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate distance between two coordinates using Haversine formula
+     * Returns distance in kilometers
+     */
+    calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = this.toRad(lat2 - lat1);
+        const dLon = this.toRad(lon2 - lon1);
+
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+
+        return distance;
+    }
+
+    /**
+     * Convert degrees to radians
+     */
+    toRad(degrees) {
+        return degrees * (Math.PI / 180);
     }
 
     /**
