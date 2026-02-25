@@ -5,6 +5,7 @@ env/
 # Models
 *.joblib
 *.h5
+*.pkl
 
 # Dataset
 data/
