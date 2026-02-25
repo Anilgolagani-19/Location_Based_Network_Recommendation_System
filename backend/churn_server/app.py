@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os , requests
+import os
 import pickle
 import numpy as np
-import os , requests
+import requests
+
+# ✅ Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, 'models')
 
 def download_model(url, path):
     if not os.path.exists(path):
@@ -11,20 +15,17 @@ def download_model(url, path):
         r = requests.get(url)
         open(path, "wb").write(r.content)
 
+# ✅ Replace URL later
 download_model(
- "HF_URL/dataset_1_XGBoost.pkl",
- "models/dataset_1_XGBoost.pkl"
+    "HF_URL/dataset_1_XGBoost.pkl",
+    os.path.join(MODEL_DIR, "dataset_1_XGBoost.pkl")
 )
 
 app = Flask(__name__)
 CORS(app)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_DIR = os.path.join(BASE_DIR, 'models')
-
 MODEL_MAP = {
-'xgb': 'dataset_1_XGBoost.pkl',
-'rf': 'random_forest_model.pkl'
+    'xgb': 'dataset_1_XGBoost.pkl'
 }
 
 loaded_models = {}
@@ -97,4 +98,5 @@ def predict():
 
 if __name__ == "__main__":
     try_load_model("xgb")
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
