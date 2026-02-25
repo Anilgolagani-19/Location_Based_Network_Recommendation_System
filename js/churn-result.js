@@ -19,20 +19,17 @@ function mapNetworkType(nt) {
 }
 
 function buildInputVector() {
-  // XGBoost model expects exactly 7 core network features
-  const input_vector = new Array(7).fill(0);
-  
-  // Network features (0-6) - Core features the model was trained on
-  input_vector[0] = getVal('mobile_age') || 0;                 // Mobile Age (years)
-  input_vector[1] = mapNetworkType(getVal('network_type')) || 4; // Network Type (4G=4, 5G=5)
-  input_vector[2] = getVal('avg_upload_speed') || 0;           // Avg Upload Speed (Mbps)
-  input_vector[3] = getVal('avg_download_speed') || 0;         // Avg Download Speed (Mbps)
-  input_vector[4] = getVal('avg_jitter') || 0;                 // Avg Jitter (ms)
-  input_vector[5] = getVal('avg_packetloss') || 0;             // Avg Packet Loss (%)
-  input_vector[6] = getVal('tower_density') || 0;              // Tower Density (per km²)
+  // Collect all features as object for backend
+  const features = {
+    mobile_age: getVal('mobile_age') || 0,
+    network_type: getVal('network_type') || '4G',
+    avg_packetloss: getVal('avg_packetloss') || 0,
+    operator: getVal('operator') || 'Jio',
+    tower_density: getVal('tower_density') || 0
+  };
 
-  console.log('Sending 7-feature vector to XGBoost model:', input_vector);
-  return input_vector;
+  console.log('Sending features object to backend:', features);
+  return features;
 }
 
 // Check backend health on page load
@@ -78,7 +75,7 @@ document.getElementById('reset').addEventListener('click', (e) => {
 document.getElementById('send').addEventListener('click', async (e) => {
   e.preventDefault();
   
-  const model = 'xgb'; // Auto-select XGBoost model
+  const model = 'rf'; // Use Random Forest model
   const btn = document.getElementById('send');
   const statusEl = document.getElementById('backend-status');
   
@@ -132,6 +129,14 @@ function displayPredictionResult(data, model) {
   let prediction = result.prediction;
   
   console.log('Backend result:', result);
+  
+  // If no proba but have raw_prediction, estimate from score
+  if ((!result.proba || result.proba.length !== 2) && result.raw_prediction !== undefined) {
+    let score = result.raw_prediction;
+    let churnProb = Math.min(1, Math.max(0, score / 50)); // assume score up to 50
+    let noChurnProb = 1 - churnProb;
+    result.proba = [noChurnProb, churnProb];
+  }
   
   // Get probabilities from backend
   let noChurnProb = 0.5;

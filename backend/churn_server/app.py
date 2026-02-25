@@ -1,8 +1,20 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
+import os , requests
 import pickle
 import numpy as np
+import os , requests
+
+def download_model(url, path):
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        r = requests.get(url)
+        open(path, "wb").write(r.content)
+
+download_model(
+ "HF_URL/dataset_1_XGBoost.pkl",
+ "models/dataset_1_XGBoost.pkl"
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -11,7 +23,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, 'models')
 
 MODEL_MAP = {
-'xgb': 'dataset_1_XGBoost.pkl'
+'xgb': 'dataset_1_XGBoost.pkl',
+'rf': 'random_forest_model.pkl'
 }
 
 loaded_models = {}
@@ -58,9 +71,26 @@ def predict():
 
         print("MODEL VECTOR:", X)
 
-        pred = model.predict(X)[0]
+        pred_raw = model.predict(X)[0]
 
-        return jsonify({"prediction": float(pred)})
+        # Threshold prediction: assume >20 means churn (1), else stay (0)
+        pred = 1 if pred_raw > 20 else 0
+
+        # Get probabilities if available
+        proba = None
+        if hasattr(model, 'predict_proba'):
+            try:
+                proba = model.predict_proba(X)[0].tolist()
+            except:
+                proba = [0.5, 0.5]  # default
+
+        result = {
+            "prediction": float(pred),
+            "raw_prediction": float(pred_raw),
+            "proba": proba
+        }
+
+        return jsonify({"results": [result]})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
