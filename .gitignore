@@ -3,7 +3,6 @@
 env/
 
 # Models
-*.pkl
 *.joblib
 *.h5
 
