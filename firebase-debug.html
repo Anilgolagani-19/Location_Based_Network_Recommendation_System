@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Data Debug</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1e88e5;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: #1e88e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        pre {
+            background: #0a0f1c;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Firebase Analytics Data Debug</h1>
+        
+        <div class="section">
+            <h2>Check Global Analytics Data</h2>
+            <button onclick="checkGlobalData()">Check Global Data</button>
+            <div id="globalStatus"></div>
+            <pre id="globalData"></pre>
+        </div>
+
+        <div class="section">
+            <h2>Check Today's Stats</h2>
+            <button onclick="checkTodayStats()">Check Today's Stats</button>
+            <div id="todayStatus"></div>
+            <pre id="todayData"></pre>
+        </div>
+
+        <div class="section">
+            <h2>Check All Analytics Documents (Last 7 days)</h2>
+            <button onclick="checkAllStats()">Check All Stats</button>
+            <div id="allStatus"></div>
+            <pre id="allData"></pre>
+        </div>
+
+        <div class="section">
+            <h2>Check Users Collection</h2>
+            <button onclick="checkUsers()">Check Users Count</button>
+            <div id="usersStatus"></div>
+            <pre id="usersData"></pre>
+        </div>
+
+        <div class="section">
+            <h2>Dashboard Metrics (What My Sights will show)</h2>
+            <button onclick="checkDashboardMetrics()">Get Dashboard Metrics</button>
+            <div id="metricsStatus"></div>
+            <pre id="metricsData"></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { analytics } from './js/analytics.js';
+
+        window.checkGlobalData = async function() {
+            try {
+                const snap = await getDoc(doc(db, 'analytics', 'global'));
+                const status = document.getElementById('globalStatus');
+                const data = document.getElementById('globalData');
+                
+                if (snap.exists()) {
+                    status.innerHTML = '<div class="status success">✓ Document Found</div>';
+                    data.textContent = JSON.stringify(snap.data(), null, 2);
+                } else {
+                    status.innerHTML = '<div class="status error">✗ Document does NOT exist</div>';
+                    data.textContent = 'No global analytics document found';
+                }
+            } catch (e) {
+                document.getElementById('globalStatus').innerHTML = '<div class="status error">✗ Error: ' + e.message + '</div>';
+            }
+        };
+
+        window.checkTodayStats = async function() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const snap = await getDoc(doc(db, 'analytics', `stats_${today}`));
+                const status = document.getElementById('todayStatus');
+                const data = document.getElementById('todayData');
+                
+                status.innerHTML = '<div class="status info">Checking: stats_' + today + '</div>';
+                
+                if (snap.exists()) {
+                    status.innerHTML += '<div class="status success">✓ Document Found</div>';
+                    data.textContent = JSON.stringify(snap.data(), null, 2);
+                } else {
+                    status.innerHTML += '<div class="status error">✗ Today\'s stats document does NOT exist</div>';
+                    data.textContent = 'No stats recorded for today yet';
+                }
+            } catch (e) {
+                document.getElementById('todayStatus').innerHTML = '<div class="status error">✗ Error: ' + e.message + '</div>';
+            }
+        };
+
+        window.checkAllStats = async function() {
+            try {
+                const status = document.getElementById('allStatus');
+                const data = document.getElementById('allData');
+                let allStats = {};
+                let foundCount = 0;
+
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toISOString().split('T')[0];
+                    
+                    const snap = await getDoc(doc(db, 'analytics', `stats_${dateStr}`));
+                    if (snap.exists()) {
+                        allStats[dateStr] = snap.data();
+                        foundCount++;
+                    } else {
+                        allStats[dateStr] = "NOT FOUND";
+                    }
+                }
+
+                status.innerHTML = '<div class="status info">Found ' + foundCount + ' of 7 days with data</div>';
+                data.textContent = JSON.stringify(allStats, null, 2);
+            } catch (e) {
+                document.getElementById('allStatus').innerHTML = '<div class="status error">✗ Error: ' + e.message + '</div>';
+            }
+        };
+
+        window.checkUsers = async function() {
+            try {
+                const snap = await getDocs(collection(db, 'users'));
+                const status = document.getElementById('usersStatus');
+                const data = document.getElementById('usersData');
+                
+                status.innerHTML = '<div class="status success">✓ Found ' + snap.size + ' users in collection</div>';
+                
+                let usersList = {};
+                snap.forEach(doc => {
+                    usersList[doc.id] = doc.data();
+                });
+                
+                data.textContent = JSON.stringify(usersList, null, 2);
+            } catch (e) {
+                document.getElementById('usersStatus').innerHTML = '<div class="status error">✗ Error: ' + e.message + '</div>';
+            }
+        };
+
+        window.checkDashboardMetrics = async function() {
+            try {
+                const metrics = await analytics.getDashboardMetrics();
+                const status = document.getElementById('metricsStatus');
+                const data = document.getElementById('metricsData');
+                
+                status.innerHTML = '<div class="status success">✓ Metrics retrieved (check console for details)</div>';
+                data.textContent = JSON.stringify(metrics, null, 2);
+                
+                console.log("Dashboard Metrics:", metrics);
+            } catch (e) {
+                document.getElementById('metricsStatus').innerHTML = '<div class="status error">✗ Error: ' + e.message + '</div>';
+            }
+        };
+    </script>
+</body>
+</html>

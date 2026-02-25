@@ -1,0 +1,392 @@
+:root {
+    --jio-blue: #0f3cc9;
+    --jio-dark-blue: #0a2a8f;
+    --text-primary: #141414;
+    --text-secondary: #666666;
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --border-color: #e0e0e0;
+    --badge-bg: #8c73cc;
+    --badge-text: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+}
+
+/* Header */
+.jio-header {
+    background-color: var(--jio-blue);
+    color: white;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.back-link {
+    color: white;
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+}
+
+.jio-logo-circle {
+    background: white;
+    color: var(--jio-blue);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.main-nav a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.main-nav a:hover, .main-nav a.active {
+    color: white;
+    border-bottom-color: white;
+}
+
+.search-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.search-bar {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    display: flex;
+    align-items: center;
+    width: 250px;
+}
+
+.search-bar input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-icon, .profile-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: white;
+}
+
+/* Main Layout */
+.main-container {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 2rem;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+}
+
+.sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.category-list {
+    list-style: none;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.category-item {
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    border-left: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+.category-item:hover {
+    background-color: #f9f9f9;
+    color: var(--jio-blue);
+}
+
+.category-item.active {
+    background-color: #e8ebfa;
+    color: var(--jio-blue);
+    border-left-color: var(--jio-blue);
+    font-weight: 700;
+}
+
+/* Plans Content */
+.plans-content {
+    flex-grow: 1;
+}
+
+.plans-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.plans-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.sort-options select {
+    padding: 0.3rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    outline: none;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Plan Card */
+.plan-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.card-badge {
+    background: var(--jio-blue);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    display: inline-block;
+    border-bottom-right-radius: 12px;
+    margin-bottom: 0.5rem;
+    width: fit-content;
+}
+
+.card-badge.hero { background: #E74C3C; }
+.card-badge.ott { background: #8E44AD; }
+
+.plan-header {
+    padding: 1rem 1.5rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.plan-price {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text-primary);
+}
+
+.plan-validity {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.val-days {
+    display: block;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.plan-details {
+    padding: 0 1.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 1rem;
+}
+
+.data-info {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.2rem;
+}
+
+.voice-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.plan-benefits {
+    padding: 0 1.5rem 1.5rem;
+    flex-grow: 1;
+}
+
+.benefit-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background: #f0f4ff;
+    color: var(--jio-blue);
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.ott-icons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.ott-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ddd; /* placeholder */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    overflow: hidden;
+}
+
+.card-actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-recharge {
+    flex: 1;
+    background: var(--jio-blue);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-recharge:hover {
+    background: var(--jio-dark-blue);
+}
+
+.btn-details {
+    color: var(--jio-blue);
+    background: none;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .category-list {
+        display: flex;
+        width: max-content;
+        border-radius: 8px;
+    }
+    
+    .category-item {
+        border-left: none;
+        border-bottom: 4px solid transparent;
+        padding: 0.8rem 1rem;
+        white-space: nowrap;
+    }
+    
+    .category-item.active {
+        border-left: none;
+        border-bottom-color: var(--jio-blue);
+    }
+    
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+}

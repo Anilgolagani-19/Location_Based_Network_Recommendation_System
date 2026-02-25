@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | TeleSignal</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/my-sights.css">
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 class="mt-3">Loading Admin Data...</h4>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            TeleSignal
+        </div>
+        <div class="sidebar-nav">
+            <a href="../index.html" class="nav-item" style="margin-bottom: 20px; color: #3b82f6;">
+                <i class="bi bi-arrow-left-circle-fill"></i> Back to Home
+            </a>
+            <a href="#" id="side-nav-dashboard" class="nav-item active"
+                onclick="adminController.switchView('dashboard', this)">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="#" id="side-nav-insights" class="nav-item" onclick="adminController.switchView('insights', this)">
+                <i class="bi bi-lightbulb"></i> Insights
+            </a>
+            <a href="#" id="side-nav-sights" class="nav-item" onclick="adminController.switchView('sights', this)">
+                <i class="bi bi-eye"></i> My Insights
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="handleLogout()" class="logout-btn">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view-section active">
+            <div class="dashboard-header mb-4">
+                <div style="display: flex; align-items: center;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()" style="display: none;">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h1 class="dashboard-title">Admin Dashboard</h1>
+                </div>
+            </div>
+
+            <!-- Main Grid Layout (3 Rows x 2 Columns) -->
+            <div class="dashboard-grid">
+
+                <!-- ROW 1: FILTERS -->
+
+                <!-- Col 1: Primary Filters (State, City, Operator, Network) -->
+                <div class="grid-card filter-card-primary">
+                    <div class="card-header-custom">
+                        <i class="bi bi-funnel-fill me-2"></i> Primary Filters
+                    </div>
+                    <div class="filter-grid-2x2">
+                        <div class="filter-group">
+                            <label class="pbi-label">State</label>
+                            <select id="stateFilter" class="pbi-select">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="pbi-label">Operator</label>
+                            <select id="operatorFilter" class="pbi-select">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="pbi-label">City</label>
+                            <select id="cityFilter" class="pbi-select">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="pbi-label">Network Type</label>
+                            <select id="networkFilter" class="pbi-select">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Secondary Filters (Area, Pincode, Year, Month) -->
+                <div class="grid-card filter-card-secondary">
+                    <div class="card-header-custom">
+                        <i class="bi bi-sliders me-2"></i> Granular Controls
+                    </div>
+                    <div class="filter-flex-row">
+                        <!-- Area & Pincode -->
+                        <div class="filter-subgroup flex-grow-1">
+                            <div class="mb-2">
+                                <label class="pbi-label">Area</label>
+                                <select id="areaFilter" class="pbi-select">
+                                    <option value="All">All</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="pbi-label">Pincode</label>
+                                <div class="pincode-search-container">
+                                    <input type="text" id="pincodeSearch" class="pincode-search-input"
+                                        placeholder="Search pincode...">
+                                    <i class="bi bi-search pincode-search-icon"></i>
+                                </div>
+                                <div class="pincode-list-container">
+                                    <select id="pincodeFilter" class="pbi-select-multi" size="3">
+                                        <option value="All">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Year & Month -->
+                        <div class="filter-subgroup flex-grow-1 border-start-custom ps-3">
+                            <label class="pbi-label">Year</label>
+                            <div id="year-filters" class="pbi-year-grid mb-3">
+                                <!-- Filled by JS -->
+                            </div>
+
+                            <label class="pbi-label">Month: <span id="month-val" class="text-primary">12</span></label>
+                            <div class="pbi-month-container">
+                                <div class="d-flex justify-content-between text-muted x-small">
+                                    <span>1</span>
+                                    <span>12</span>
+                                </div>
+                                <input type="range" class="form-range pbi-range" id="monthFilter" min="1" max="12"
+                                    value="12">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: REVENUE KPI CARDS (NEW) -->
+                <!-- Col 1: Daily Revenue -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper"
+                            style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="kpi-daily-revenue">0</div>
+                            <div class="pbi-kpi-label">Daily Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Subscription Count -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper"
+                            style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="kpi-subscription-count">0</div>
+                            <div class="pbi-kpi-label">Active Operator Subscriptions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: EXISTING KPI CARDS -->
+
+                <!-- Col 1: Upload Speed KPI -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper icon-upload">
+                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value" id="main-kpi-upload">26.59</div>
+                            <div class="pbi-kpi-label">Average of upload_mbps</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Download Speed KPI -->
+                <div class="grid-card kpi-card-main">
+                    <div class="kpi-content">
+                        <div class="kpi-icon-wrapper icon-download">
+                            <i class="bi bi-cloud-arrow-down-fill"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <div class="pbi-kpi-value">45.20</div>
+                            <div class="pbi-kpi-label">Average of download_mbps</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 4: CHARTS & ANALYTICS -->
+
+                <!-- 1. Revenue -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Revenue Analytics (Daily/Monthly/Yearly)
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartRevenue"></canvas>
+                    </div>
+                </div>
+
+                <!-- 2. Avg Download Speed by Operator -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Average Download Speed by Operator (Peak vs Non-Peak)
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartDownloadOp"></canvas>
+                    </div>
+                </div>
+
+                <!-- 3. Avg Latency by City -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">
+                        Avg Latency by City and Network Type
+                    </div>
+                    <div class="chart-container-custom">
+                        <canvas id="chartLatencyCity"></canvas>
+                    </div>
+                </div>
+
+                <!-- 4. Coverage Growth -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">4G vs 5G Coverage Growth</div>
+                    <div class="chart-container-custom"><canvas id="chartCoverageGrowth"></canvas></div>
+                </div>
+
+                <!-- 5. Network Score -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">Network Score</div>
+                    <div class="chart-container-custom"><canvas id="chartScoreOp"></canvas></div>
+                </div>
+
+                <!-- 6. Latency Trends -->
+                <div class="grid-card chart-card-custom">
+                    <div class="card-header-custom">Latency Trends</div>
+                    <div class="chart-container-custom"><canvas id="chartLatencyYear"></canvas></div>
+                </div>
+
+                <!-- 7. BIG CHART: Avg Download Speed Trend -->
+                <div class="grid-card chart-card-custom" style="grid-column: 1 / -1;">
+                    <div class="card-header-custom">Avg Download Speed Trend</div>
+                    <div class="chart-container-custom"><canvas id="chartDownloadYear"></canvas></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- My Sights View (Analytics) -->
+        <div id="sights-view" class="view-section">
+            <div class="dashboard-header mb-4">
+                <h1 class="dashboard-title">My Insights – User Behavior & Conversion Analytics</h1>
+            </div>
+
+            <!-- Main Layout Container -->
+            <div class="sights-layout">
+
+                <!-- ROW 1: KPI GRID (2 Rows x 3 Cols) -->
+                <div class="kpi-grid-container mb-4">
+                    <!-- Row 1 of KPIs -->
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-total-users">0</div>
+                        <div class="kpi-label-modern">Total Users</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-avg-session">0s</div>
+                        <div class="kpi-label-modern">Avg Session Time</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-location-sub">0</div>
+                        <div class="kpi-label-modern">Location Submissions</div>
+                    </div>
+
+                    <!-- Row 2 of KPIs -->
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-more-clicks">0</div>
+                        <div class="kpi-label-modern">More Clicks (Views)</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-plan-views">0</div>
+                        <div class="kpi-label-modern">Plan Views</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <div class="kpi-value-large" id="kpi-get-sim">0</div>
+                        <div class="kpi-label-modern">Get SIM Clicks</div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: CHARTS (2 Columns) -->
+                <div class="charts-grid-2col mb-4">
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">User Journey Conversion Funnel</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartFunnel"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Average Session Duration Over Time</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartSessionTrend"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: Extra Charts (Optional/Existing) -->
+                <div class="charts-grid-2col mb-4">
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Operator-wise Plan Views</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartOpPlanViews"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card-modern">
+                        <div class="chart-header-modern">Operator-wise Get SIM Clicks</div>
+                        <div class="chart-body-modern">
+                            <canvas id="chartOpGetSim"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boost Section -->
+                <div class="boost-section-modern">
+                    <div class="boost-content">
+                        <h3>Partner with TeleSignal</h3>
+                        <p>Boost your operator visibility and gain premium insights into user network preferences.</p>
+                    </div>
+                    <button class="boost-btn-modern" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
+                        <i class="bi bi-rocket-takeoff-fill me-2"></i> Tie up & Boost
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Insights View -->
+        <div id="insights-view" class="view-section">
+            <div id="insights-container" class="insights-grid">
+                <!-- Data populated by JS -->
+                <div class="text-center w-100 py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Loading insights...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-hidden="true" style="color: #000;">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Boost Plan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-center mb-4 text-muted">Choose a plan to feature your operator and access advanced
+                        analytics.</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="plan-card" onclick="adminController.selectPlan(this, 'monthly')">
+                                <h5>Monthly</h5>
+                                <h2 class="text-primary">₹9,999</h2>
+                                <p class="text-muted small">/month</p>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Basic Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Weekly Reports</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="plan-card selected" onclick="adminController.selectPlan(this, 'quarterly')">
+                                <div class="badge bg-warning text-dark mb-2">Most Popular</div>
+                                <h5>Quarterly</h5>
+                                <h2 class="text-primary">₹24,999</h2>
+                                <p class="text-muted small">/3 months</p>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Priority Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Daily Reports</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Competitor Analysis</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="plan-card" onclick="adminController.selectPlan(this, 'yearly')">
+                                <h5>Yearly</h5>
+                                <h2 class="text-primary">₹89,999</h2>
+                                <p class="text-muted small">/year</p>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Top Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Real-time Dashboard</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> API Access</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary btn-lg w-100" id="payBtn"
+                        onclick="adminController.handlePayment()">
+                        Pay ₹24,999 and Boost
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Data Service -->
+    <script src="../data/generate_dataset.js"></script>
+    <!-- Auth Service -->
+    <script type="module" src="../js/auth.js"></script>
+    <!-- Analytics Service -->
+    <script type="module" src="../js/analytics.js"></script>
+    <!-- Insights Manager -->
+    <script src="../js/insights-manager.js"></script>
+    <!-- Admin Controller -->
+    <script type="module" src="../js/admin-dashboard.js"></script>
+
+
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar) sidebar.classList.toggle('mobile-open');
+            if (overlay) overlay.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>

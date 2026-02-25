@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vi Plans | TeleSignal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/operator-dark-theme.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --accent-color: #f59e0b;
+        }
+
+        /* Vi Yellow */
+    </style>
+</head>
+
+<body>
+
+    <!-- Global Navbar -->
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+    <header style="background: transparent;">
+        <div class="logo-section">
+            <span
+                style="background:var(--accent-color); color:black; padding:4px 8px; border-radius:4px; font-weight:800;">Vi</span>
+            <span>Prepaid Plans</span>
+        </div>
+        <a href="dashboards/user-dashboard.html" class="back-btn">
+            <i data-feather="arrow-left" style="width:16px; height:16px; vertical-align:middle;"></i> Dashboard
+        </a>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar" id="categorySidebar"></aside>
+
+        <main class="main-content">
+            <div class="hero-slider-compact" id="heroBanner"></div>
+            <div class="filter-chips">
+                <!-- Chips injected via JS -->
+            </div>
+
+            <div id="plansContainer"></div>
+
+            <h3 style="margin-top:3rem;">Why Vi?</h3>
+            <div class="info-grid" id="infoGrid"></div>
+
+            <h3 style="margin-top:2rem;">Help & Support</h3>
+            <div id="faqList"></div>
+            <br><br><br>
+        </main>
+    </div>
+
+    <!-- Ad Modal -->
+    <div class="ad-modal" id="adModal">
+        <button class="ad-close-btn" id="adCloseBtn">×</button>
+        <img src="" class="ad-image" id="adImage">
+        <div class="ad-content">
+            <h4 class="ad-title" id="adTitle">Special Offer</h4>
+            <p class="ad-text" id="adText">Loading offer...</p>
+            <a href="#" target="_blank" class="ad-cta" id="adLink">View Details</a>
+        </div>
+    </div>
+
+    <script src="js/ads-popup.js"></script>
+    <script type="module">
+        import { analytics } from './js/analytics.js';
+
+        // Expose to window for inline onclicks
+        window.trackGetSim = (opName) => {
+            analytics.trackGetSimClick(opName);
+        };
+
+        // Track Plan View on Load
+        analytics.trackPlanView('Vi');
+
+        feather.replace();
+
+        let currentOperatorData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('data/operators.json').then(r => r.json()).then(data => {
+                const op = data.operators.find(o => o.id === 'vi');
+                if (!op) return;
+
+                // 0. Inject "Visit Official Website" Button in Header
+                const header = document.querySelector('header');
+                if (!document.getElementById('headerOfficialBtn')) {
+                    const btn = document.createElement('a');
+                    btn.id = 'headerOfficialBtn';
+                    btn.href = op.officialWebsite;
+                    btn.target = '_blank';
+                    btn.className = 'btn-recharge';
+                    btn.style.width = 'auto';
+                    btn.style.padding = '0.5rem 1rem';
+                    btn.style.fontSize = '0.85rem';
+                    btn.style.marginLeft = 'auto'; // Push to right
+                    btn.style.marginRight = '1rem';
+                    btn.style.textDecoration = 'none'; // Ensure no underline
+                    btn.innerHTML = `Visit ${op.name} <i data-feather="external-link" style="width:14px;height:14px;vertical-align:middle;margin-left:4px;"></i>`;
+
+                    // Analytics Tracking
+                    btn.addEventListener('click', () => {
+                        window.trackGetSim(op.id);
+                    });
+
+                    // Insert before the back button if possible, or append
+                    const backBtn = header.querySelector('.back-btn');
+                    if (backBtn) header.insertBefore(btn, backBtn);
+                    else header.appendChild(btn);
+
+                    feather.replace();
+                }
+
+                // 1. Sidebar
+                const sidebar = document.getElementById('categorySidebar');
+                if (op.planCategories) {
+                    sidebar.innerHTML = op.planCategories.map((cat, idx) =>
+                        `<div class="sidebar-item ${idx === 0 ? 'active' : ''}" onclick="filterPlans('${cat}', document.querySelectorAll('.chip')[${idx + 1}])">${cat}</div>`
+                    ).join('');
+                }
+
+                // 2. Banner & Description
+                if (op.heroSlides && op.heroSlides.length) {
+                    document.getElementById('heroBanner').innerHTML = `
+                        <div class="hero-slide" style="background-image: url('${op.heroSlides[0].image}'); position: relative;">
+                             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);"></div>
+                             <div style="position:absolute; bottom:20px; left:20px; right:20px; color:white; text-shadow:0 2px 4px rgba(0,0,0,0.8); z-index: 2;">
+                                <h1 style="margin:0; font-size: 2.5rem; line-height: 1.2;">${op.name}</h1>
+                                <p style="margin:8px 0; font-size:1rem; opacity:1; max-width: 800px;">${op.longDescription || op.description}</p>
+                             </div>
+                        </div>
+                    `;
+                }
+
+                // 2.5 Top Chips
+                if (op.planCategories) {
+                    const chipContainer = document.querySelector('.filter-chips');
+                    chipContainer.innerHTML = `<div class="chip active" onclick="filterPlans('all', this)">All Plans</div>` +
+                        op.planCategories.map(cat => `<div class="chip" onclick="filterPlans('${cat}', this)">${cat}</div>`).join('');
+                }
+
+                // Initial Render
+                currentOperatorData = op;
+                renderPlans(op, 'all');
+
+                // 4. Info & FAQ
+                if (op.whyChoose) document.getElementById('infoGrid').innerHTML = op.whyChoose.map(i => `<div class="info-card"><span class="info-icon">${i.icon}</span><span class="info-title">${i.title}</span><span class="info-desc">${i.desc}</span></div>`).join('');
+                if (op.faqs) document.getElementById('faqList').innerHTML = op.faqs.map(f => `<div class="faq-item"><div class="faq-q">${f.q}</div><div class="faq-a">${f.a}</div></div>`).join('');
+
+                // 5. Ad
+                if (op.adImage) document.getElementById('adImage').src = op.adImage;
+                if (op.adText) document.getElementById('adText').textContent = op.adText;
+                document.getElementById('adTitle').textContent = `Vi Hero Unlimited`;
+                document.getElementById('adLink').href = op.officialWebsite;
+                document.getElementById('adLink').addEventListener('click', () => window.trackGetSim(op.id));
+            });
+        });
+
+        // Expose to window
+        window.filterPlans = function (category, element) {
+            // Update active chip
+            if (element) {
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                element.classList.add('active');
+            } else {
+                // If triggered programmatically (e.g. from View All), find matching chip
+                const chips = document.querySelectorAll('.chip');
+                chips.forEach(c => {
+                    if (c.textContent === category) c.classList.add('active');
+                    else c.classList.remove('active');
+                });
+            }
+
+            // Update Sidebar
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                if (el.textContent === category) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+
+            renderPlans(currentOperatorData, category);
+
+            // Scroll to top of plans container for better UX
+            const container = document.getElementById('plansContainer');
+            if (container) {
+                const headerOffset = 100;
+                const elementPosition = container.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+
+        window.renderPlans = function (op, filterCategory) {
+            if (!op) return;
+            const container = document.getElementById('plansContainer');
+            container.innerHTML = '';
+
+            const grouped = {};
+            op.planCategories.forEach(cat => grouped[cat] = []);
+            op.plans.forEach(p => {
+                if (filterCategory === 'all' || p.category === filterCategory) {
+                    if (grouped[p.category]) grouped[p.category].push(p);
+                    else if (grouped['Hero Unlimited']) grouped['Hero Unlimited'].push(p);
+                }
+            });
+
+            for (const [cat, plans] of Object.entries(grouped)) {
+                if (plans.length === 0) continue;
+                const section = document.createElement('div');
+                section.className = 'category-section';
+                section.id = 'cat-' + cat.replace(/\s+/g, '-');
+                section.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-title">${cat} (${plans.length})</div>
+                         <div style="color:var(--accent-color); cursor:pointer;" onclick="filterPlans('${cat}', null)">View All</div>
+                    </div>
+                    <div class="plans-grid-modern">
+                        ${plans.map(plan => `
+                            <div class="plan-card-modern" style="${plan.isRecommended ? 'border: 1px solid var(--accent-color);' : ''}">
+                                <div class="plan-top-badges">
+                                    ${plan.features.includes('Binge All Night') ? `<div class="badge badge-trending" style="background:#000; color:#fff">Binge Night</div>` : ''}
+                                    ${plan.isBestValue ? `<div class="badge" style="background:#10b981; color:white;">Best Value</div>` : ''}
+                                    ${plan.isRecommended ? `<div class="badge" style="background:var(--accent-color); color:white;">Recommended</div>` : ''}
+                                </div>
+                                <div class="plan-body">
+                                    <div class="plan-price-row">
+                                        <div class="price">${plan.price}</div>
+                                        <div class="view-details-link" onclick="window.open('${op.officialWebsite}', '_blank'); window.trackGetSim('${op.id}');">View Details ></div>
+                                    </div>
+                                    <div class="plan-specs">
+                                        <div class="spec-item">Validity<span class="spec-val">${plan.validity}</span></div>
+                                        <div class="spec-item">Data<span class="spec-val">${plan.data}</span></div>
+                                    </div>
+                                    <div class="plan-features-list">
+                                        ${plan.features.slice(0, 3).map(f => `<span class="feature-pill">${f}</span>`).join('')}
+                                    </div>
+                                </div>
+                                <div class="plan-footer">
+                                    <button class="btn-recharge" onclick="window.open('${op.officialWebsite}', '_blank'); window.trackGetSim('${op.id}');">Recharge</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            }
+        }
+    </script>
+</body>
+
+</html>

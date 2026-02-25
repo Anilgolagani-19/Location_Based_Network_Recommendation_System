@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Forecasting - TeleSignal</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/forecasting.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>     
+
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <ion-icon name="cellular-outline"></ion-icon>
+            Tele<span>Signal</span>
+        </div>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../features.html">Features</a></li>
+            <li><a href="../about.html">About Us</a></li>
+            <li><a href="churn-result.html" class="ml-prediction-btn">ML Prediction</a></li>
+            <li><a href="forecasting.html" class="active forecasting-btn">Forecasting</a></li>
+            <li><a href="../contact.html">Contact</a></li>
+        </ul>
+        <div class="auth-buttons" id="authContainer">
+            <div id="loggedOutButtons">
+                <a href="../login.html" class="btn btn-primary">Login</a>
+                <a href="../signup.html" class="btn btn-outline" style="margin-left:10px; display:inline-block;">Sign Up</a>
+            </div>
+            <div id="loggedInProfile" style="display: none; align-items: center; gap: 10px;">
+                <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
+            </div>
+        </div>
+
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-item" onclick="window.location.href='user-dashboard.html'">
+                <ion-icon name="grid-outline"></ion-icon> Dashboard
+            </div>
+            <div class="dropdown-item" onclick="window.handleLogout()">
+                <ion-icon name="log-out-outline"></ion-icon> Logout
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="forecasting-container">
+        <div class="forecast-header">
+            <h1>Network Forecasting & Predictions</h1>
+            <p>Advanced predictions powered by machine learning and time-series analysis</p>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="forecast-tabs">
+            <button class="tab-btn active" data-tab="churn-forecast">Churn Prediction</button>
+            <button class="tab-btn" data-tab="signal-forecast">Signal Strength</button>
+            <button class="tab-btn" data-tab="latency-forecast">Latency</button>
+        </div>
+
+        <!-- CHURN PREDICTION TAB -->
+        <div class="tab-content active" id="churn-forecast">
+            <div class="forecast-section">
+                <div class="section-header">
+                    <h2><ion-icon name="warning-outline"></ion-icon> Churn Risk Prediction</h2>
+                    <p>Identify customers at risk of churning based on network performance and usage patterns</p>
+                </div>
+
+                <div class="prediction-controls">
+                    <div class="input-group">
+                        <label>Mobile Age (years)</label>
+                        <input type="number" id="mobileAge" value="2.5" step="0.1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Network Type</label>
+                        <select id="networkType">
+                            <option value="4">4G</option>
+                            <option value="5">5G</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Download Speed (Mbps)</label>
+                        <input type="number" id="downloadSpeed" value="45.8" step="0.1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Upload Speed (Mbps)</label>
+                        <input type="number" id="uploadSpeed" value="15.5" step="0.1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Satisfaction Level (0-10)</label>
+                        <input type="number" id="satisfactionLevel" value="8.5" step="0.1" min="0" max="10">
+                    </div>
+                    <div class="input-group">
+                        <label>Months Active</label>
+                        <input type="number" id="monthsActive" value="24" step="1" min="1">
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="btn btn-primary" onclick="runChurnPrediction()">Run Prediction</button>
+                    </div>
+                </div>
+
+                <div id="churnResults" class="results-container" style="display: none;">
+                    <h3>Prediction Results</h3>
+                    <div class="results-grid">
+                        <div class="result-card" id="rfResult">
+                            <h4>Random Forest Model</h4>
+                            <div class="prediction-output">
+                                <p id="rfPrediction">-</p>
+                                <p id="rfConfidence">-</p>
+                            </div>
+                        </div>
+                        <div class="result-card" id="xgbResult">
+                            <h4>XGBoost Model</h4>
+                            <div class="prediction-output">
+                                <p id="xgbPrediction">-</p>
+                                <p id="xgbConfidence">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-summary" id="churnSummary"></div>
+                </div>
+
+                <div class="test-scenarios">
+                    <h3>Quick Test Scenarios</h3>
+                    <button class="scenario-btn" onclick="loadScenario('good')">
+                        <span class="badge badge-success">✓</span> Good Customer
+                    </button>
+                    <button class="scenario-btn" onclick="loadScenario('risk')">
+                        <span class="badge badge-warning">⚠</span> High Risk Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNAL STRENGTH FORECAST TAB -->
+        <div class="tab-content" id="signal-forecast">
+            <div class="forecast-section">
+                <div class="section-header">
+                    <h2><ion-icon name="wifi-outline"></ion-icon> Signal Strength Forecasting</h2>
+                    <p>60-day signal strength predictions for all operators using SARIMAX time-series analysis</p>
+                </div>
+
+                <div class="forecast-controls">
+                    <div class="filter-group">
+                        <label>Select Operator:</label>
+                        <select id="operatorSelect" onchange="updateSignalChart()">
+                            <option value="all">All Operators</option>
+                            <option value="Airtel">Airtel</option>
+                            <option value="Jio">Jio</option>
+                            <option value="Vi">Vi</option>
+                            <option value="BSNL">BSNL</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Days to Forecast:</label>
+                        <select id="forecastDays" onchange="updateSignalChart()">
+                            <option value="30">30 Days</option>
+                            <option value="60" selected>60 Days</option>
+                            <option value="90">90 Days</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="runSignalForecast()">Generate Forecast</button>
+                </div>
+
+                <div id="signalChartContainer" style="display: none;">
+                    <div style="position: relative; height: 500px;">
+                        <canvas id="signalChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="signalTableContainer" style="display: none;">
+                    <h3>Forecasted Signal Strength (dBm)</h3>
+                    <table class="forecast-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Airtel</th>
+                                <th>Jio</th>
+                                <th>Vi</th>
+                                <th>BSNL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="signalTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="signal-info">
+                    <h3>Understanding Signal Strength</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <p><strong>-60 to -80 dBm</strong><br>Excellent signal</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>-80 to -100 dBm</strong><br>Good signal</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>-100 to -120 dBm</strong><br>Fair signal</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>Below -120 dBm</strong><br>Poor signal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LATENCY FORECAST TAB -->
+        <div class="tab-content" id="latency-forecast">
+            <div class="forecast-section">
+                <div class="section-header">
+                    <h2><ion-icon name="flash-outline"></ion-icon> Latency Forecasting</h2>
+                    <p>Predict network latency trends for the next 60 days using time-series analysis</p>
+                </div>
+
+                <div class="forecast-controls">
+                    <div class="filter-group">
+                        <label>Select Operator:</label>
+                        <select id="latencyOperatorSelect" onchange="updateLatencyChart()">
+                            <option value="all">All Operators</option>
+                            <option value="Airtel">Airtel</option>
+                            <option value="Jio">Jio</option>
+                            <option value="Vi">Vi</option>
+                            <option value="BSNL">BSNL</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Days to Forecast:</label>
+                        <select id="latencyForecastDays" onchange="updateLatencyChart()">
+                            <option value="30">30 Days</option>
+                            <option value="60" selected>60 Days</option>
+                            <option value="90">90 Days</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="runLatencyForecast()">Generate Forecast</button>
+                </div>
+
+                <div id="latencyChartContainer" style="display: none;">
+                    <div style="position: relative; height: 500px;">
+                        <canvas id="latencyChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="latencyTableContainer" style="display: none;">
+                    <h3>Forecasted Network Latency (ms)</h3>
+                    <table class="forecast-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Airtel</th>
+                                <th>Jio</th>
+                                <th>Vi</th>
+                                <th>BSNL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="latencyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="latency-info">
+                    <h3>Understanding Latency</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <p><strong>&lt; 20 ms</strong><br>Excellent (Gaming)</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>20-50 ms</strong><br>Good (Video Call)</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>50-100 ms</strong><br>Fair (Streaming)</p>
+                        </div>
+                        <div class="info-card">
+                            <p><strong>&gt; 100 ms</strong><br>Poor (Basic Usage)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>TeleSignal</h3>
+                <p>Next-Gen Network Analytics for a connected world.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="../features.html">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">API</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="../about.html">About Us</a>
+                <a href="#">Careers</a>
+                <a href="../contact.html">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Security</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TeleSignal. All rights reserved.
+        </div>
+    </footer>
+
+    <script type="module" src="../js/auth.js"></script>
+    <script src="forecasting.js"></script>
+   
+</body>
+
+</html>
