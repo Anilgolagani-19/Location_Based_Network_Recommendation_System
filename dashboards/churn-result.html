@@ -395,6 +395,14 @@ false (0) = Customer will NOT CHURN
 
 </div>
 
+<script>
+    // Check if user is logged in
+    if (localStorage.getItem('userLoggedIn') !== 'true') {
+        alert('You must be logged in to access this page.');
+        window.location.href = '../login.html';
+    }
+</script>
+
 <script src="../js/churn-result.js"></script>
 <script type="module" src="../js/auth.js"></script>
 <footer>

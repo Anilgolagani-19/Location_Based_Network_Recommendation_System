@@ -25,7 +25,8 @@ app = Flask(__name__)
 CORS(app)
 
 MODEL_MAP = {
-    'xgb': 'dataset_1_XGBoost.pkl'
+    'xgb': 'dataset_1_XGBoost.pkl',
+    'rf': 'random_forest_model.pkl'
 }
 
 loaded_models = {}
@@ -47,8 +48,9 @@ def try_load_model(key):
 def predict():
     data = request.get_json(force=True)
     features = data.get("features")
+    model_key = data.get("model", "xgb")
 
-    model = try_load_model("xgb")
+    model = try_load_model(model_key)
 
     try:
         # ⭐ numerical
