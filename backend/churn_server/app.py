@@ -5,7 +5,9 @@ import pickle
 import numpy as np
 import requests
 
-# ✅ Paths
+# =========================
+# Paths
+# =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, 'models')
 
@@ -15,12 +17,15 @@ def download_model(url, path):
         r = requests.get(url)
         open(path, "wb").write(r.content)
 
-# ✅ Replace URL later
+# Optional model download (can ignore if file already exists)
 download_model(
     "HF_URL/dataset_1_XGBoost.pkl",
     os.path.join(MODEL_DIR, "dataset_1_XGBoost.pkl")
 )
 
+# =========================
+# Flask app
+# =========================
 app = Flask(__name__)
 CORS(app)
 
@@ -44,48 +49,40 @@ def try_load_model(key):
     loaded_models[key] = model
     return model
 
+# =========================
+# Prediction API
+# =========================
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json(force=True)
-    features = data.get("features")
+    features = data.get("features", {})
     model_key = data.get("model", "xgb")
 
     model = try_load_model(model_key)
 
     try:
-        # ⭐ numerical
-        mobile_age = float(features["mobile_age"])
-        tower_density = float(features["tower_density"])
+       # ⭐ convert incoming 25-feature dict → list
+        feature_values = list(features.values())
 
-        # ⭐ derive congestion
-        congestion = float(features["avg_packetloss"]) * 10
+# ⭐ reshape for sklearn
+        X = np.array(feature_values).reshape(1, -1)
 
-        # ⭐ network encoding
-        network_5g = 1 if features["network_type"] == "5G" else 0
-
-        # ⭐ operator encoding
-        op = features["operator"]
-        op_bsnl = 1 if op == "BSNL" else 0
-        op_jio = 1 if op == "Jio" else 0
-        op_vi = 1 if op in ["Vi", "VI"] else 0
-
-        # ⭐ model vector (7 features)
-        X = np.array([[mobile_age, tower_density, congestion, network_5g, op_bsnl, op_jio, op_vi]])
-
+        print("MODEL VECTOR (25):", X)
         print("MODEL VECTOR:", X)
 
+        # ⭐ prediction
         pred_raw = model.predict(X)[0]
 
-        # Threshold prediction: assume >20 means churn (1), else stay (0)
+        # ⭐ threshold logic
         pred = 1 if pred_raw > 20 else 0
 
-        # Get probabilities if available
+        # ⭐ probability
         proba = None
         if hasattr(model, 'predict_proba'):
             try:
                 proba = model.predict_proba(X)[0].tolist()
             except:
-                proba = [0.5, 0.5]  # default
+                proba = [0.5, 0.5]
 
         result = {
             "prediction": float(pred),
@@ -96,9 +93,21 @@ def predict():
         return jsonify({"results": [result]})
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("🔥 ERROR:", e)
+        raise
 
+# =========================
+# Health check
+# =========================
+@app.route('/models', methods=['GET'])
+def get_models():
+    available_models = list(MODEL_MAP.keys())
+    return jsonify({"models": available_models})
+
+# =========================
+# Run
+# =========================
 if __name__ == "__main__":
     try_load_model("xgb")
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

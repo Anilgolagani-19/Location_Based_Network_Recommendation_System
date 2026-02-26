@@ -6,10 +6,9 @@
 <title>Churn Predictor - Result</title>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<link rel="stylesheet" href="../css/common.css">
 
 <style>
-/* ===== COMMON THEME (INLINE COPY FROM common.css essentials) ===== */
-
 :root {
     --primary-color: #8b5cf6;
     --secondary-color: #14b8a6;
@@ -23,417 +22,141 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg-dark);color:var(--text-main)}
 
-body{
-    font-family: Inter, system-ui, sans-serif;
-    background: var(--bg-dark);
-    color: var(--text-main);
-    margin:0;
-}
-
-/* ===== NAVBAR FIX ===== */
-.navbar {
-   display:flex;
-   align-items:center;
-   justify-content:space-between;
-}
-
-/* ===== LAYOUT ===== */
-
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:30px 0;
-}
-
-.card{
-    background:var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border:1px solid var(--glass-border);
-    border-radius:16px;
-    padding:24px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.37);
-    margin-bottom:25px;
-}
-
-.row{
-    display:flex;
-    gap:24px;
-    flex-wrap:wrap;
-}
-
-.col{
-    flex:1;
-    min-width:280px;
-}
-
-.field{
-    margin-bottom:18px;
-}
-
-/* ===== FORM ===== */
-
-label{
-    display:block;
-    margin-bottom:6px;
-    font-size:13px;
-    color:var(--text-muted);
-}
-
-input,select{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid var(--glass-border);
-    background:var(--bg-card);
-    color:var(--text-main);
-}
-
-input:focus,select:focus{
-    outline:none;
-    border-color:var(--primary-color);
-}
-
-button{
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:600;
-}
-
-#send{
-    background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
-    color:white;
-    width:100%;
-}
-
-#reset{
-    background:transparent;
-    border:1px solid var(--primary-color);
-    color:var(--primary-color);
-    margin-bottom:10px;
-    width:100%;
-}
-
-#send:hover{transform:translateY(-2px)}
-#reset:hover{background:var(--primary-color);color:white}
-
-/* ===== STATUS ===== */
-
-#backend-status{
-    background:rgba(255,255,255,0.05);
-    color:var(--text-muted);
-}
-
-/* ===== PREDICTION ===== */
-
-.prediction-card{
-    display:none;
-    border:2px solid var(--secondary-color);
-    background:rgba(20,184,166,0.1);
-    border-radius:16px;
-    padding:20px;
-}
-
-.prediction-card.show{display:block}
-
-.prediction-result{
-    font-size:44px;
-    font-weight:800;
-    color:var(--secondary-color);
-}
-
-.prediction-label{
-    color:var(--text-muted);
-    margin-bottom:6px;
-}
-
-.prediction-proba{
-    color:var(--text-muted);
-}
-
-.error-card{
-    display:none;
-    border:2px solid #ef4444;
-    background:rgba(239,68,68,0.15);
-    border-radius:16px;
-    padding:16px;
-    margin-top:10px;
-}
-
-.error-card.show{display:block}
-
-/* ===== RESPONSIVE ===== */
-
-@media(max-width:800px){
-    body{padding:15px}
-}
-
-/* ===== PROFILE DROPDOWN ===== */
-
-.profile-dropdown {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 8px 0;
-    min-width: 180px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.37);
-    display: none;
-    z-index: 1000;
-}
-
-.profile-dropdown.show {
-    display: block;
-}
-
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    color: var(--text-main);
-    text-decoration: none;
-    transition: background 0.2s ease;
-    cursor: pointer;
-}
-
-.dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.dropdown-item ion-icon {
-    font-size: 18px;
-    color: var(--primary-color);
-}
-
-.profile-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.profile-circle:hover {
-    transform: scale(1.05);
-}
-
-
-
-
-/* ===== ML HERO (same as forecasting) ===== */
-.ml-hero {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 20px;
-    padding: 60px 40px;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.ml-hero h1 {
-    font-size: 42px;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
-
-.ml-hero p {
-    font-size: 17px;
-    opacity: 0.9;
-}
+.container{max-width:1300px;margin:auto;padding:30px}
+.card{background:var(--glass-bg);backdrop-filter:blur(10px);border:1px solid var(--glass-border);border-radius:16px;padding:24px;margin-bottom:25px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.field{margin-bottom:14px}
+label{display:block;margin-bottom:6px;font-size:13px;color:var(--text-muted)}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-card);color:var(--text-main)}
+input:focus,select:focus{outline:none;border-color:var(--primary-color)}
+button{padding:13px;border:none;border-radius:10px;cursor:pointer;font-weight:600}
+#send{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:white;width:100%}
+#reset{background:transparent;border:1px solid var(--primary-color);color:var(--primary-color);margin-bottom:10px;width:100%}
+.ml-hero{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));border-radius:20px;padding:60px 40px;text-align:center;margin-bottom:30px}
+.ml-hero h1{font-size:42px;margin-bottom:15px}
+.ml-hero p{opacity:.9}
+.group-title{font-weight:600;margin:25px 0 10px;color:var(--secondary-color)}
 </style>
-<link rel="stylesheet" href="../css/common.css">
 </head>
 
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="logo">
             <ion-icon name="cellular-outline"></ion-icon>
             Tele<span>Signal</span>
         </div>
-<!-- <nav class="navbar">
-  <div class="logo">Tele<span>Signal</span></div> -->
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../features.html">Features</a></li>
+            <li><a href="../about.html">About Us</a></li>
+            <a href="churn-result.html" class="active">ML Prediction</a>
+            <a href="forecasting.html">Forecasting</a>
+            <li><a href="../contact.html">Contact</a></li>
+        </ul>
+        <div class="auth-buttons" id="authContainer">
+            <div id="loggedOutButtons">
+                <a href="../login.html" class="btn btn-primary">Login</a>
+                <a href="../signup.html" class="btn btn-outline" style="margin-left:10px; display:inline-block;">Sign Up</a>
+            </div>
+            <div id="loggedInProfile" style="display: none; align-items: center; gap: 10px;">
+                <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
+            </div>
+        </div>
 
-  <ul class="nav-links">
-    <li><a href="../index.html">Home</a></li>
-    <li><a href="../features.html">Features</a></li>
-    <li><a href="../about.html">About Us</a></li>
-    <li><a href="../dashboards/churn-result.html" class="ml-prediction-btn">ML Prediction</a></li>
-    <li><a href="../dashboards/forecasting.html">Forecasting</a></li>
-    <li><a href="../contact.html">Contact</a></li>
-  </ul>
-  <div class="auth-buttons" id="authContainer">
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-item" onclick="window.location.href='user-dashboard.html'">
+                <ion-icon name="grid-outline"></ion-icon> Dashboard
+            </div>
+            <div class="dropdown-item" onclick="window.handleLogout()">
+                <ion-icon name="log-out-outline"></ion-icon> Logout
+            </div>
+        </div>
+    </nav>
 
-    <div id="loggedOutButtons" style="display:none">
-        <a href="../login.html" class="btn btn-primary">Login</a>
-        <a href="../signup.html" class="btn btn-outline" style="margin-left:10px;">Sign Up</a>
-    </div>
-
-<div id="loggedInProfile" style="display:none; align-items:center; gap:10px;">        <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
-    </div>
-
-</div>
-
-<!-- Profile Dropdown -->
-<div class="profile-dropdown" id="profileDropdown">
-    <div class="dropdown-item" onclick="window.location.href='user-dashboard.html'">
-        <ion-icon name="grid-outline"></ion-icon> Dashboard
-    </div>
-    <div class="dropdown-item" onclick="window.handleLogout()">
-        <ion-icon name="log-out-outline"></ion-icon> Logout
-    </div>
-</div>
-
-</nav>
+<body>
 <div class="container">
 
 <div class="ml-hero">
-
-    <h1>Churn Predictor — Prediction Engine</h1>
-
-    <p>
-        Churn prediction helps identify customers likely to discontinue service by analyzing
-        network performance indicators such as speed, latency, packet loss, and infrastructure density.
-        This module supports proactive retention strategies by transforming connectivity metrics into
-        actionable risk insights.
-    </p>
-
+<h1>Churn Predictor — Prediction Engine</h1>
+<p>Enter all network, customer and plan metrics to predict churn probability.</p>
 </div>
 
 <div class="card">
 
+<h3 class="group-title">📊 Network & Device Metrics</h3>
 <div class="row">
-
-<div class="col">
-
-<div class="field"><label>Mobile Age (years)</label><input id="mobile_age" type="number" placeholder="e.g., 2.5" step="0.1"></div>
-<div class="field"><label>Network Type</label><input id="network_type" placeholder="e.g., 4G or 5G"></div>
-<div class="field"><label>Avg Upload Speed (Mbps)</label><input id="avg_upload_speed" type="number" placeholder="e.g., 15.5" step="0.1"></div>
-<div class="field"><label>Avg Download Speed (Mbps)</label><input id="avg_download_speed" type="number" placeholder="e.g., 45.8" step="0.1"></div>
-<div class="field"><label>Avg Jitter (ms)</label><input id="avg_jitter" type="number" placeholder="e.g., 12.5" step="0.1"></div>
-<div class="field"><label>Avg Packetloss (%)</label><input id="avg_packetloss" type="number" placeholder="e.g., 0.5" step="0.1"></div>
-<div class="field"><label>Tower Density (per km²)</label><input id="tower_density" type="number" placeholder="e.g., 25.3" step="0.1"></div>
-
+<div class="field"><label>Mobile Age</label><input id="Mobile_age" type="number" step="0.1"></div>
+<div class="field"><label>Network Type (2=4G,3=5G)</label><input id="Network_type" type="number"></div>
+<div class="field"><label>Avg Upload Speed</label><input id="upload" type="number" step="0.1"></div>
+<div class="field"><label>Avg Download Speed</label><input id="download" type="number" step="0.1"></div>
+<div class="field"><label>Avg Jitter</label><input id="jitter" type="number" step="0.1"></div>
+<div class="field"><label>Avg Packet Loss</label><input id="packet" type="number" step="0.1"></div>
+<div class="field"><label>Tower Density</label><input id="tower" type="number" step="0.1"></div>
+<div class="field"><label>Signal Strength</label><input id="signal" type="number"></div>
+<div class="field"><label>Congestion Level %</label><input id="congestion" type="number"></div>
+<div class="field"><label>Total Calls</label><input id="calls" type="number"></div>
+<div class="field"><label>Issues Resolved</label><input id="issues" type="number"></div>
+<div class="field"><label>Satisfaction Level</label><input id="satisfaction" type="number" step="0.1"></div>
+<div class="field"><label>Months Active</label><input id="months" type="number"></div>
+<div class="field"><label>Latency Score</label><input id="latency" type="number"></div>
 </div>
 
-<div class="col">
+<h3 class="group-title">📱 Device OS</h3>
+<div class="row">
+<select id="device_os">
+<option value="Android">Android</option>
+<option value="iOS">iOS</option>
+</select>
+</div>
 
-<div class="field">
-<label>Operator</label>
+<h3 class="group-title">📡 Operator</h3>
+<div class="row">
 <select id="operator">
-<option value="Jio" selected>Jio</option>
-<option value="Airtel">Airtel</option>
-<option value="BSNL">BSNL</option>
-<option value="Vi">Vi</option>
-<option value="Other">Other</option>
+<option>Jio</option>
+<option>Airtel</option>
+<option>BSNL</option>
+<option>Vi</option>
 </select>
 </div>
 
-<div class="field">
-<label>Plan Type</label>
-<select id="plan_type">
-<option value="Yearly Plan" selected>Yearly Plan</option>
-<option value="Monthly Plan">Monthly Plan</option>
-<option value="3 Months Plan">3 Months Plan</option>
-<option value="Other">Other</option>
+<h3 class="group-title">💳 Plan Type</h3>
+<div class="row">
+<select id="plan">
+<option>Monthly Plan</option>
+<option>3 Months Plan</option>
+<option>Yearly Plan</option>
 </select>
 </div>
 
-<div class="field">
-<label>Satisfaction Level (0-10)</label>
-<input id="satisfaction_level" type="number" placeholder="e.g., 8.5" step="0.1" min="0" max="10">
-</div>
-
-<div class="field">
-<label>Months Active</label>
-<input id="months_active" type="number" placeholder="e.g., 24" min="1">
-</div>
-
-<div class="field">
-<label>Backend Status</label>
-<input id="backend-status" disabled value="Checking..." />
+<h3 class="group-title">💰 Payment Type</h3>
+<div class="row">
+<select id="payment">
+<option>Prepaid</option>
+<option>Postpaid</option>
+</select>
 </div>
 
 <button id="reset">Clear Form</button>
 <button id="send">🚀 Predict Churn</button>
-
+<div id="prediction-result" style="margin-top:20px;">
+  <h3 id="prediction-label"></h3>
+  <p>Prediction: <span id="prediction-value"></span></p>
+  <p id="prediction-proba"></p>
 </div>
 
-</div>
+<div id="prediction-error" style="color:#ff6b6b;margin-top:15px;"></div>
 
 </div>
-
-<h3 style="margin-bottom:10px">Prediction Result</h3>
-
-<div id="prediction-result" class="prediction-card">
-<div id="prediction-label" class="prediction-label"></div>
-<div id="prediction-value" class="prediction-result"></div>
-<div id="prediction-proba" class="prediction-proba"></div>
-
-<div style="margin-top:10px;font-size:13px;color:var(--text-muted)">
-<strong>Legend:</strong><br>
-true (1) = Customer will CHURN<br>
-false (0) = Customer will NOT CHURN
 </div>
-</div>
-
-<div id="prediction-error" class="error-card"></div>
-
-<div id="help" style="margin-top:10px;color:var(--text-muted);display:none">
-⚠️ Backend Not Running
-</div>
-
-</div>
-
-<script>
-    // Check if user is logged in
-    if (localStorage.getItem('userLoggedIn') !== 'true') {
-        alert('You must be logged in to access this page.');
-        window.location.href = '../login.html';
-    }
-</script>
-
-<script src="../js/churn-result.js"></script>
 <script type="module" src="../js/auth.js"></script>
-<footer>
-        <div class="footer-content">
-            <div class="footer-col">
-                <h3>TeleSignal</h3>
-                <p>Next-Gen Network Analytics for a connected world.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Product</h4>
-                <a href="features.html">Features</a>
-                <a href="#">Pricing</a>
-                <a href="#">API</a>
-            </div>
-            <div class="footer-col">
-                <h4>Company</h4>
-                <a href="about.html">About Us</a>
-                <a href="#">Careers</a>
-                <a href="contact.html">Contact</a>
-            </div>
-            <div class="footer-col">
-                <h4>Legal</h4>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Security</a>
-            </div>
-        </div>
-        <div class="copyright">
-            &copy; 2025 TeleSignal. All rights reserved.
-        </div>
-    </footer>
-
+<script src="../js/churn-result.js"></script>
 </body>
 </html>
