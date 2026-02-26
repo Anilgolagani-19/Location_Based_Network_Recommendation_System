@@ -156,6 +156,44 @@ button{padding:13px;border:none;border-radius:10px;cursor:pointer;font-weight:60
 
 </div>
 </div>
+<!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>TeleSignal</h3>
+                <p>Next-Gen Network Analytics for a connected world.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="../features.html">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">API</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="../about.html">About Us</a>
+                <a href="#">Careers</a>
+                <a href="../contact.html">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Security</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TeleSignal. All rights reserved.
+        </div>
+    </footer>
+<script>
+  const isLoggedIn = localStorage.getItem("userLoggedIn");
+
+  if (isLoggedIn !== "true") {
+    alert("Please login to access ML Prediction");
+    window.location.href = "../login.html";
+  }
+</script>
 <script type="module" src="../js/auth.js"></script>
 <script src="../js/churn-result.js"></script>
 </body>
