@@ -68,28 +68,29 @@ function reportError(message, type = 'error') {
 /* =========================
    ⭐ UNIVERSAL REDIRECT
 ========================= */
-function handleAuthRedirect() {
-    const rootPrefix = window.location.pathname.includes('dashboards') ? '../' : '';
+window.handleAuthRedirect = function () {
 
     // If user just signed up from the signup page, send them to their dashboard.
     if (window.location.pathname.toLowerCase().includes('signup')) {
-        window.location.href = `${rootPrefix}dashboards/user-dashboard.html`;
+        window.location.href = "/dashboards/user-dashboard.html";
         return;
     }
 
     // If we have a known role/name in localStorage, route accordingly
     const name = (localStorage.getItem('userName') || '').toLowerCase();
+
     if (name === 'admin') {
-        window.location.href = `${rootPrefix}dashboards/admin-dashboard.html`;
+        window.location.href = "/dashboards/admin-dashboard.html";
         return;
     }
+
     if (name === 'operator') {
-        window.location.href = `${rootPrefix}dashboards/user-dashboard.html`;
+        window.location.href = "/dashboards/user-dashboard.html";
         return;
     }
 
     // Default fallback
-    window.location.href = `${rootPrefix}index.html`;
+    window.location.href = "/index.html";
 }
 
 /* =========================
@@ -98,64 +99,63 @@ function handleAuthRedirect() {
 if (elements.signupForm) {
     elements.signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log('[SIGNUP] submit event');
 
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const submitBtn = elements.signupForm.querySelector('button[type="submit"]');
 
-        try {
+        // disable button immediately
+        if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating Account...';
+        }
 
+        try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            console.log('[SIGNUP] created user', user.uid);
 
             await updateProfile(user, { displayName: name });
-
-            sendEmailVerification(user).catch(()=>{});
+            sendEmailVerification(user).catch(() => {});
 
             await setDoc(doc(db, "users", user.uid), {
-                name, email, createdAt: serverTimestamp(), uid: user.uid
+                name,
+                email,
+                createdAt: serverTimestamp(),
+                uid: user.uid
             }, { merge: true });
 
+            // update local state
             localStorage.setItem('userLoggedIn', 'true');
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
 
-            analytics.incrementTotalUsers().catch(()=>{});
+            analytics.incrementTotalUsers().catch(() => {});
 
             reportError("✅ Account created successfully!", 'success');
 
-            // Re-enable the button and show redirecting state (helps if navigation
-            // is blocked or slow — prevents UI from being stuck permanently).
-            try {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Redirecting...';
-                }
-            } catch (e) { /* ignore */ }
-
-            // Attempt immediate redirect to dashboard
-            try {
-                handleAuthRedirect();
-            } catch (e) {
-                console.warn('Redirect failed', e);
+            // final button state before redirect
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Redirecting...';
             }
 
-            // Fallback: if still on signup page after 3s, reset button state
+            
+            console.log('[SIGNUP] scheduling final redirect');
             setTimeout(() => {
-                const stillOnSignup = window.location.pathname.toLowerCase().includes('signup');
-                if (stillOnSignup && submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Sign Up';
-                }
-            }, 3000);
+                // always send new signups straight to dashboard
+                window.location.href = '/dashboards/user-dashboard.html';
+            }, 500);
 
         } catch (err) {
+            console.error('[SIGNUP] error', err);
             reportError(parseAuthError(err.code));
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Sign Up';
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign Up';
+            }
         }
     });
 }
