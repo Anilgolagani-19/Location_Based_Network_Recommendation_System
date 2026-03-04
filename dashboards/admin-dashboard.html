@@ -45,6 +45,9 @@
             <a href="#" id="side-nav-sights" class="nav-item" onclick="adminController.switchView('sights', this)">
                 <i class="bi bi-eye"></i> My Insights
             </a>
+            <a href="#" id="side-nav-customers" class="nav-item" onclick="adminController.switchView('customers', this)">
+                <i class="bi bi-people"></i> Customer Details
+            </a>
         </div>
         <div class="sidebar-footer">
             <button onclick="handleLogout()" class="logout-btn">
@@ -369,7 +372,49 @@
                 </div>
             </div>
         </div>
+    
+        <!-- Customer Details View -->
+<div id="customers-view" class="view-section">
+
+<div class="dashboard-header mb-4">
+<h1 class="dashboard-title">Customer Details</h1>
+</div>
+
+<div class="dashboard-grid">
+
+<div class="grid-card">
+
+        <select id="operatorSelect" class="form-select mb-3" style="max-width:300px">
+            <option value="vi">VI</option>
+            <option value="airtel">Airtel</option>
+            <option value="jio">Jio</option>
+            <option value="bsnl">BSNL</option>
+        </select>
+
+<div style="overflow-x:auto">
+
+<table class="table table-dark table-striped" id="customerTable" style="min-width:1000px">
+            <thead>
+                <tr>
+                    <th>Network</th>
+                    <th>Operator</th>
+                    <th>State</th>
+                    <th>Signal</th>
+                    <th>Issues</th>
+                    <th>Plan</th>
+                    <th>Months</th>
+                    <th>Latency</th>
+                    <th>Churn</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
     </div>
+
+</div>
 
     <!-- Subscription Modal -->
     <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-hidden="true" style="color: #000;">
@@ -446,6 +491,45 @@
     <script src="../js/insights-manager.js"></script>
     <!-- Admin Controller -->
     <script type="module" src="../js/admin-dashboard.js"></script>
+    <script>
+
+async function loadCustomers(operator="vi"){
+
+    const response = await fetch(`http://127.0.0.1:7000/customers/${operator}`);
+    const data = await response.json();
+
+    const tableBody = document.querySelector("#customerTable tbody");
+    tableBody.innerHTML = "";
+
+    data.data.forEach(row => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${row.Network_type}</td>
+            <td>${row.Operator}</td>
+            <td>${row.State}</td>
+            <td>${row.Signal_strength_dBm}</td>
+            <td>${row.No_of_Issues_Resolved}</td>
+            <td>${row.Plan_Type}</td>
+            <td>${row.Months_Active}</td>
+            <td>${row.Latency_Score}</td>
+            <td>${row.Customer_Churn}</td>
+        `;
+
+        tableBody.appendChild(tr);
+
+    });
+
+}
+
+document.getElementById("operatorSelect").addEventListener("change", function(){
+    loadCustomers(this.value);
+    
+});
+loadCustomers("vi");
+
+</script>
 
 
 

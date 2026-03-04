@@ -36,22 +36,29 @@
     font-size: 0.9rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-dark);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     color: white;
-    font-size: 1rem;
-    transition: border-color 0.3s;
+    font-size: 14px;
 }
 
-.form-group input:focus {
+.form-group select {
+    appearance: none;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
 }
-
 .auth-footer {
     margin-top: 20px;
     font-size: 0.9rem;

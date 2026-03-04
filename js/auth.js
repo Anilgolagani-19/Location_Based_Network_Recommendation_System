@@ -85,6 +85,7 @@ if (elements.signupForm) {
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const operator = document.getElementById('operator').value;
         const submitBtn = elements.signupForm.querySelector('button[type="submit"]');
 
         try {
@@ -99,11 +100,13 @@ if (elements.signupForm) {
 
             // Sync with Firestore
             await setDoc(doc(db, "users", user.uid), {
-                name, email, createdAt: new Date(), uid: user.uid
+                name, email, operator, createdAt: new Date(), uid: user.uid
             }, { merge: true });
+            localStorage.setItem('userOperator', 'Operator'); // Default to Operator for new signups
 
             // Analytics: Increment Total Users
             await analytics.incrementTotalUsers();
+            localStorage.setItem('userOperator', operator);
 
             reportError("Success! Check your email for verification.", 'success');
             setTimeout(() => handleAuthRedirect(email), 2500);
