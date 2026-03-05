@@ -1,0 +1,267 @@
+/* Admin Dashboard Custom Styles (Redesign) */
+
+:root {
+    --dashboard-bg: #11112b;
+    /* Darker Purple-Blue Background */
+    --card-bg: rgba(30, 27, 75, 0.4);
+    /* Glassmorphism Base */
+    --card-border: rgba(139, 92, 246, 0.2);
+    /* Soft Purple Border */
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+    --primary-accent: #6366f1;
+    /* Indigo */
+    --secondary-accent: #8b5cf6;
+    /* Violet */
+    --highlight: #22d3ee;
+    /* Cyan */
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+
+    --font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 Equal Columns */
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+    }
+}
+
+/* Common Card Style */
+.grid-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    padding: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.card-header-custom {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+}
+
+/* Filter Styles */
+.filter-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.filter-flex-row {
+    display: flex;
+    gap: 20px;
+}
+
+.filter-subgroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.border-start-custom {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pbi-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.pbi-select,
+.pincode-search-input,
+.pbi-select-multi {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.pbi-select:focus,
+.pincode-search-input:focus {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.pbi-select option {
+    background: #1e1b4b;
+    color: white;
+}
+
+/* KPI Cards */
+.kpi-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 100%;
+}
+
+.kpi-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.icon-upload {
+    background: rgba(34, 211, 238, 0.1);
+    color: #22d3ee;
+    border: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.icon-download {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.pbi-kpi-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.pbi-kpi-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+/* Charts */
+.chart-container-custom {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Specific Component Utilities */
+.pincode-search-container {
+    position: relative;
+}
+
+.pincode-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.pincode-list-container {
+    margin-top: 5px;
+}
+
+.pbi-year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.year-tile {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.year-tile.active,
+.year-tile:hover {
+    background: var(--primary-accent);
+    color: white;
+    border-color: var(--primary-accent);
+}
+
+.pbi-range {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: var(--highlight);
+}
+
+/* Header & Sidebar overrides */
+.dashboard-title {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Loading Overlay */
+#loading-overlay {
+    background: #0f172a;
+    z-index: 9999;
+}

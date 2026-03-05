@@ -1,0 +1,376 @@
+/* Operator Pages Stylesheet - High Fidelity Replica */
+
+:root {
+    --jio-blue: #0f3cc9;
+    /* Official Jio Blue */
+    --airtel-red: #f40000;
+    /* Official Airtel Red */
+    --vi-purple: #fece31;
+    /* Vi Yellow (often used for pricing) or Purple #440099 */
+    --bsnl-orange: #ff9933;
+    --text-primary: #141414;
+    --text-secondary: #666666;
+    --card-border: #e0e0e0;
+    --bg-light: #f5f7f9;
+}
+
+body {
+    font-family: 'JioType', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+.plan-price {
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+/* --- Navigation --- */
+.top-nav {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.top-nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.operator-logo-nav {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--operator-color, --jio-blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 32px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.back-home-btn {
+    background: var(--operator-color, --jio-blue);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+.back-home-btn:hover {
+    transform: scale(1.05);
+}
+
+/* --- Secondary Tabs (Pill Style) --- */
+.secondary-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--card-border);
+    padding: 16px 0;
+}
+
+.secondary-nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.tab-links {
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.tab-links li {
+    padding: 10px 24px;
+    border-radius: 50px;
+    background: #f0f0f0;
+    color: var(--text-secondary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-links li.active {
+    background: var(--operator-color, --jio-blue);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Layout --- */
+.page-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+}
+
+/* Sidebar */
+.sidebar-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.category-list {
+    list-style: none;
+}
+
+.category-list li {
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    transition: background 0.2s;
+}
+
+.category-list li:hover {
+    background: #eef2f5;
+}
+
+.category-list li.active {
+    background: #eef2f5;
+    color: var(--operator-color, --jio-blue);
+    border-left: 4px solid var(--operator-color, --jio-blue);
+    border-radius: 4px 12px 12px 4px;
+    /* Straight edge on left */
+}
+
+.category-count {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+/* --- Plan Cards (High Fidelity) --- */
+.main-content {
+    /* No width restriction */
+}
+
+/* Ad Banner */
+.ad-banner {
+    background: linear-gradient(100deg, var(--operator-color, --jio-blue), #000);
+    color: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ad-title {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.ad-description {
+    font-size: 18px;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-bottom: 24px;
+}
+
+.ad-cta {
+    background: #fff;
+    color: var(--operator-color, --jio-blue);
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Grid */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* Detailed Plan Card */
+.plan-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border-color: var(--operator-color, --jio-blue);
+}
+
+.plan-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--operator-color, --jio-blue);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px 0 20px 0;
+    /* Leaf shape */
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.plan-price {
+    font-size: 40px;
+    /* Big price like Jio */
+    color: var(--text-primary);
+    margin: 20px 0 8px 0;
+}
+
+.plan-validity {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: inline-block;
+    background: #f5f5f5;
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.plan-data {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--operator-color, --jio-blue);
+    margin-bottom: 24px;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 16px;
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 24px;
+}
+
+.plan-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.plan-features li::before {
+    content: '';
+    display: block;
+    min-width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+
+.plan-buy-btn {
+    width: 100%;
+    background: var(--operator-color, --jio-blue);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 50px;
+    /* Pill Button */
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.plan-buy-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* About Section */
+.about-section h3 {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.about-section p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+/* --- Operator Specifics --- */
+body.operator-jio {
+    --operator-color: #0f3cc9;
+}
+
+body.operator-airtel {
+    --operator-color: #f40000;
+}
+
+body.operator-vi {
+    --operator-color: #fece31;
+}
+
+/* Use Yellow? Or text black? */
+/* Fix for Vi yellow background text contrast if needed */
+body.operator-vi .plan-buy-btn {
+    color: #000;
+}
+
+body.operator-bsnl {
+    --operator-color: #008140;
+    /* BSNL Green/Blue */
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .page-container {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+        /* Hide sidebar on mobile for cleaner look */
+    }
+
+    .nav-links {
+        display: none;
+    }
+}

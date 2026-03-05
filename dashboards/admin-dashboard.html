@@ -495,7 +495,7 @@
 
 async function loadCustomers(operator="vi"){
 
-    const response = await fetch(`http://127.0.0.1:7000/customers/${operator}`);
+    const response = await fetch(`http://127.0.0.1:10000/customers/${operator}`);
     const data = await response.json();
 
     const tableBody = document.querySelector("#customerTable tbody");
