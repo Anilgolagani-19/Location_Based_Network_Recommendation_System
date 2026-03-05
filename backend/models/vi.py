@@ -7,12 +7,11 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-model_path = os.path.join("models", "jio_churn.pkl")
+model_path = os.path.join("models", "vi_churn.pkl")
 model = pickle.load(open(model_path, "rb"))
-
-# @app.route("/")
-# def home():
-#     return " jio model API Running"
+@app.route("/")
+def home():
+    return " vi model API Running"
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -60,7 +59,7 @@ def predict():
         result = "Customer Will Churn ❌" if prediction == 1 else "Customer Will Stay ✅"
 
         return jsonify({
-            "operator":"Jio",
+            "operator":"Vi",
             "prediction":result
         })
 
@@ -68,4 +67,4 @@ def predict():
         return jsonify({"error":str(e)})
 
 if __name__ == "__main__":
-    app.run(port=5003, debug=True)
+    app.run(port=5004, debug=True)

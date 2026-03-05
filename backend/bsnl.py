@@ -10,9 +10,9 @@ CORS(app)
 model_path = os.path.join("models", "bsnl_churn.pkl")
 model = pickle.load(open(model_path, "rb"))
 
-@app.route("/")
-def home():
-    return " bsnl model API Running"
+# @app.route("/")
+# def home():
+#     return " bsnl model API Running"
 
 @app.route("/predict", methods=["POST"])
 def predict():

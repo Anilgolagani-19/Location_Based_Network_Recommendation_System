@@ -15,9 +15,9 @@ model = loaded["model"]
 columns = loaded["columns"]
 
 
-# @app.route("/")
-# def home():
-#     return "Airtel Model API Running"
+@app.route("/")
+def home():
+    return "Airtel Model API Running"
 
 
 @app.route("/predict", methods=["POST"])

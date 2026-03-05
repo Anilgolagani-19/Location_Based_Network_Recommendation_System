@@ -9,9 +9,9 @@ CORS(app)
 
 model_path = os.path.join("models", "vi_churn.pkl")
 model = pickle.load(open(model_path, "rb"))
-@app.route("/")
-def home():
-    return " vi model API Running"
+# @app.route("/")
+# def home():
+#     return " vi model API Running"
 
 @app.route("/predict", methods=["POST"])
 def predict():

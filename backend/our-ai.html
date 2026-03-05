@@ -246,7 +246,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
 
-const API_BASE = "https://location-based-network-recommendation.onrender.com";
+const API_BASE =
+    location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:5001"
+        : "https://location-based-network-recommendation-system.onrender.com";
 
 const api = `${API_BASE}/predict`;
     form.addEventListener("submit", async function(e){

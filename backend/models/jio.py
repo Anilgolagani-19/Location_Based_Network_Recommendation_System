@@ -10,9 +10,9 @@ CORS(app)
 model_path = os.path.join("models", "jio_churn.pkl")
 model = pickle.load(open(model_path, "rb"))
 
-# @app.route("/")
-# def home():
-#     return " jio model API Running"
+@app.route("/")
+def home():
+    return " jio model API Running"
 
 @app.route("/predict", methods=["POST"])
 def predict():
