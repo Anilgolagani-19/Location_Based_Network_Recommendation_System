@@ -1,0 +1,142 @@
+:root {
+    --vi-yellow: #fecb00;
+    --vi-red: #da291c;
+    --vi-dark: #2f2f2f;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f8f8f8;
+    margin: 0;
+}
+
+.vi-header {
+    background: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: var(--vi-red);
+    letter-spacing: -2px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+}
+
+.hero {
+    background: var(--vi-yellow);
+    padding: 3rem 1rem;
+    text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    color: var(--vi-dark);
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.pills-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.pill {
+    background: transparent;
+    border: 2px solid var(--vi-dark);
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pill.active,
+.pill:hover {
+    background: var(--vi-dark);
+    color: var(--vi-yellow);
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.vi-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    position: relative;
+    border-top: 6px solid var(--vi-yellow);
+}
+
+.vi-card h3 {
+    font-size: 2.2rem;
+    margin: 0;
+    color: var(--vi-dark);
+}
+
+.details-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+    color: #555;
+    border-bottom: 2px dashed #eee;
+    padding-bottom: 1rem;
+}
+
+.benefit-list {
+    margin-bottom: 1.5rem;
+}
+
+.b-item {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vi-btn {
+    width: 100%;
+    background: var(--vi-red);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.hero-badge {
+    position: absolute;
+    top: -15px;
+    right: 20px;
+    background: var(--vi-dark);
+    color: var(--vi-yellow);
+    padding: 0.3rem 1rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}

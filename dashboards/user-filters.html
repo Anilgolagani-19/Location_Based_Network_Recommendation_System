@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Network | TeleSignal</title>
+    <link rel="stylesheet" href="../css/userdashboard.css">
+    <link rel="stylesheet" href="../css/location-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .filter-landing-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        }
+
+        .filter-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .filter-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4A90E2 0%, #E27D4A 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .filter-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        .filter-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(74, 144, 226, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .nav-back {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-back:hover {
+            color: #fff;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .filter-card {
+                padding: 25px;
+            }
+
+            .filter-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .pincode-list-scroll {
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        .filter-select-multi {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: #fff;
+            padding: 5px;
+            outline: none;
+        }
+
+        .filter-select-multi option {
+            padding: 8px 12px;
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-select-multi option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-select-multi option:checked {
+            background: var(--primary-blue) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="../index.html" class="nav-back">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
+
+    <div class="filter-landing-container">
+        <div class="filter-card">
+            <div class="filter-header">
+                <h1>Check Network Performance</h1>
+                <p>Select your location to get personalized operator recommendations and plans.</p>
+            </div>
+
+            <!-- Location Status (hidden by default) -->
+            <div id="locationStatus" class="location-status" style="display: none;">
+                <i class="bi bi-info-circle"></i>
+                <span id="locationStatusText"></span>
+            </div>
+
+            <!-- Use My Location Button -->
+            <button type="button" class="use-location-btn" id="useLocationBtn">
+                <i class="bi bi-geo-alt-fill"></i>
+                Use My Location
+            </button>
+
+            <form id="filterForm" class="filter-form">
+                <div class="filter-group">
+                    <label class="filter-label">State</label>
+                    <select id="filter-state" class="filter-select" required>
+                        <option value="All">All States</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">City</label>
+                    <select id="filter-city" class="filter-select">
+                        <option value="All">All Cities</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Area</label>
+                    <select id="filter-area" class="filter-select">
+                        <option value="All">All Areas</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Network Type</label>
+                    <select id="filter-network" class="filter-select">
+                        <option value="All">All Networks</option>
+                        <option value="4G">4G</option>
+                        <option value="5G">5G</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Pincode</label>
+                    <div class="search-container mb-2">
+                        <input type="text" id="pincodeSearch" class="filter-select" placeholder="Search pincode..."
+                            style="width: 100%;">
+                    </div>
+                    <div class="pincode-list-scroll">
+                        <select id="filter-pincode" class="filter-select-multi" size="5">
+                            <option value="All">All Pincodes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    View Personalized Dashboard <i class="bi bi-chevron-right ms-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Location Service -->
+    <script src="../js/location-service.js"></script>
+
+    <!-- Data Service and Logic -->
+    <script src="../js/data-processor.js"></script>
+    <!-- Import Analytics (as module) is tricky if this isn't a module script. Let's make it a module. -->
+    <script type="module">
+        import { analytics } from '../js/analytics.js';
+
+        // Expose to window if needed or just use here
+        window.analytics = analytics;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // ... existing setup ...
+            const stateSelect = document.getElementById('filter-state');
+            const citySelect = document.getElementById('filter-city');
+            const areaSelect = document.getElementById('filter-area');
+            const pincodeSelect = document.getElementById('filter-pincode');
+            const pincodeSearch = document.getElementById('pincodeSearch');
+            const networkSelect = document.getElementById('filter-network');
+            const form = document.getElementById('filterForm');
+            const useLocationBtn = document.getElementById('useLocationBtn');
+            const locationStatus = document.getElementById('locationStatus');
+            const locationStatusText = document.getElementById('locationStatusText');
+
+            let allPincodes = [];
+
+            // Location Detection Handler
+            if (useLocationBtn) {
+                useLocationBtn.addEventListener('click', async () => {
+                    // Disable button
+                    useLocationBtn.disabled = true;
+                    useLocationBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Detecting...';
+
+                    // Show status
+                    locationStatus.style.display = 'flex';
+                    locationStatus.className = 'location-status detecting';
+                    locationStatusText.textContent = 'Detecting your location...';
+
+                    try {
+                        const result = await locationService.detectAndMatchLocation(dataProcessor);
+
+                        if (result.success) {
+                            // Success - auto-populate filters
+                            locationStatus.className = 'location-status success';
+                            locationStatusText.textContent = `Location detected: ${result.detectedLocation.city}`;
+
+                            // Apply filters
+                            if (result.location.state && result.location.state !== 'All') {
+                                stateSelect.value = result.location.state;
+                                dataProcessor.filters.state = result.location.state;
+
+                                // Populate cities
+                                const cities = dataProcessor.getCitiesForState(result.location.state);
+                                populateDropdown(citySelect, cities, 'All Cities');
+                            }
+
+                            if (result.location.city && result.location.city !== 'All') {
+                                citySelect.value = result.location.city;
+                                dataProcessor.filters.city = result.location.city;
+
+                                // Populate areas
+                                const areas = dataProcessor.getAreasForCity(result.location.city);
+                                populateDropdown(areaSelect, areas, 'All Areas');
+                            }
+
+                            // Auto-submit after 1.5 seconds
+                            setTimeout(() => {
+                                form.dispatchEvent(new Event('submit'));
+                            }, 1500);
+
+                        } else {
+                            // Error handling
+                            locationStatus.className = 'location-status error';
+
+                            if (result.error === 'permission_denied') {
+                                locationStatusText.textContent = 'Location permission denied. Please enable in browser settings.';
+                            } else if (result.error === 'location_not_available') {
+                                locationStatusText.textContent = `Service not available in ${result.detectedLocation?.city || 'your area'}.`;
+                            } else {
+                                locationStatusText.textContent = 'Unable to detect location. Please try again.';
+                            }
+
+                            // Re-enable button
+                            useLocationBtn.disabled = false;
+                            useLocationBtn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> Try Again';
+                        }
+
+                    } catch (error) {
+                        console.error('Location detection error:', error);
+                        locationStatus.className = 'location-status error';
+                        locationStatusText.textContent = 'Location detection failed. Please select manually.';
+
+                        useLocationBtn.disabled = false;
+                        useLocationBtn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> Try Again';
+                    }
+                });
+            }
+
+            // Load initial data
+            await dataProcessor.loadData();
+
+            // Populate States
+            const states = dataProcessor.getUniqueValues('state');
+            populateDropdown(stateSelect, states, 'All States');
+
+            // 1. Check for saved filters
+            const savedFilters = localStorage.getItem('dashboardFilters');
+            if (savedFilters) {
+                try {
+                    const parsed = JSON.parse(savedFilters);
+
+                    // Restore State
+                    if (parsed.state && parsed.state !== 'All') {
+                        stateSelect.value = parsed.state;
+                        dataProcessor.filters.state = parsed.state;
+
+                        // Populate Cities
+                        const cities = dataProcessor.getCitiesForState(parsed.state);
+                        populateDropdown(citySelect, cities, 'All Cities');
+
+                        // Restore City
+                        if (parsed.city && parsed.city !== 'All') {
+                            citySelect.value = parsed.city;
+                            dataProcessor.filters.city = parsed.city;
+
+                            // Populate Areas
+                            const areas = dataProcessor.getAreasForCity(parsed.city);
+                            populateDropdown(areaSelect, areas, 'All Areas');
+
+                            // Restore Area
+                            if (parsed.area && parsed.area !== 'All') {
+                                areaSelect.value = parsed.area;
+                                dataProcessor.filters.area = parsed.area;
+
+                                // Populate Pincodes for Area
+                                allPincodes = dataProcessor.getPincodesForArea(parsed.area);
+                            } else {
+                                allPincodes = dataProcessor.getPincodesForArea('All');
+                            }
+                        } else {
+                            allPincodes = dataProcessor.getPincodesForArea('All');
+                        }
+                    } else {
+                        allPincodes = dataProcessor.getUniqueValues('pincode');
+                    }
+
+                    // Final Pincode Population & Restore
+                    populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+                    if (parsed.pincode && parsed.pincode !== 'All') {
+                        // Check if the saved pincode is in the current list
+                        if (allPincodes.includes(Number(parsed.pincode)) || allPincodes.includes(parsed.pincode.toString())) {
+                            pincodeSelect.value = parsed.pincode;
+                        }
+                    }
+
+                    // Restore Network
+                    if (parsed.network && parsed.network !== 'All') {
+                        if (networkSelect) networkSelect.value = parsed.network;
+                    }
+
+                } catch (e) {
+                    console.error("Error loading saved filters:", e);
+                    // Fallback to default
+                    allPincodes = dataProcessor.getUniqueValues('pincode');
+                    populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+                }
+            } else {
+                // Default Initialization if no saved filters
+                allPincodes = dataProcessor.getUniqueValues('pincode');
+                populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+            }
+
+            // Cascading Logic
+            stateSelect.addEventListener('change', () => {
+                const state = stateSelect.value;
+                dataProcessor.updateFilter('state', state);
+
+                const cities = dataProcessor.getCitiesForState(state);
+                populateDropdown(citySelect, cities, 'All Cities');
+
+                // Clear UI values for dependent filters
+                citySelect.value = 'All';
+                areaSelect.innerHTML = '<option value="All">All Areas</option>';
+
+                // Refresh Pincodes
+                allPincodes = dataProcessor.getPincodesForArea('All');
+                populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+            });
+
+            citySelect.addEventListener('change', () => {
+                const city = citySelect.value;
+                dataProcessor.updateFilter('city', city);
+
+                const areas = dataProcessor.getAreasForCity(city);
+                populateDropdown(areaSelect, areas, 'All Areas');
+
+                areaSelect.value = 'All';
+
+                // Refresh Pincodes
+                allPincodes = dataProcessor.getPincodesForArea('All');
+                populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+            });
+
+            areaSelect.addEventListener('change', () => {
+                const area = areaSelect.value;
+                dataProcessor.updateFilter('area', area);
+
+                allPincodes = dataProcessor.getPincodesForArea(area);
+                populateDropdown(pincodeSelect, allPincodes, 'All Pincodes');
+            });
+
+            // Bidirectional: Pincode change updates State, City, Area
+            pincodeSelect.addEventListener('change', () => {
+                const pincode = pincodeSelect.value;
+                if (pincode !== 'All') {
+                    dataProcessor.updateFilter('pincode', pincode);
+
+                    const location = dataProcessor.filters; // already updated by updateFilter
+                    stateSelect.value = location.state;
+
+                    const cities = dataProcessor.getCitiesForState(location.state);
+                    populateDropdown(citySelect, cities, 'All Cities');
+                    citySelect.value = location.city;
+
+                    const areas = dataProcessor.getAreasForCity(location.city);
+                    populateDropdown(areaSelect, areas, 'All Areas');
+                    areaSelect.value = location.area;
+                }
+            });
+
+            // Pincode Search logic
+            pincodeSearch.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = allPincodes.filter(p => p.toString().includes(term));
+                populateDropdown(pincodeSelect, filtered, 'All Pincodes');
+            });
+
+            function populateDropdown(el, values, defaultLabel) {
+                // Don't nuke the element if valid options exist and we just want to update content
+                // But generally simpler to rebuild
+                const currentVal = el.value;
+                el.innerHTML = `<option value="All">${defaultLabel}</option>`;
+                values.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v;
+                    opt.textContent = v;
+                    el.appendChild(opt);
+                });
+                // We typically just reset to 'All' unless logic above restored it
+                // Logic above handles restoration explicitly
+                // so here we might just default to 'All' if not set
+                if (el.value === '') el.value = 'All';
+            }
+
+            // Handle Submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Track Analytics
+                if (analytics) {
+                    await analytics.trackLocationSubmission();
+                }
+
+                const params = new URLSearchParams();
+                params.set('state', stateSelect.value);
+                params.set('city', citySelect.value);
+                params.set('area', areaSelect.value);
+                params.set('network', document.getElementById('filter-network').value);
+                params.set('pincode', pincodeSelect.value);
+
+                // Save to localStorage before navigating
+                const filters = {
+                    state: stateSelect.value,
+                    city: citySelect.value,
+                    area: areaSelect.value,
+                    network: document.getElementById('filter-network').value,
+                    pincode: pincodeSelect.value
+                };
+                localStorage.setItem('dashboardFilters', JSON.stringify(filters));
+
+                window.location.href = `user-dashboard.html?${params.toString()}`;
+            });
+        });
+    </script>
+</body>
+
+</html>

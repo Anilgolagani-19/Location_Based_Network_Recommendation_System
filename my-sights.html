@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Sights | TeleSignal</title>
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="css/common.css">
+
+    <!-- Bootstrap CSS for layout/modals -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS for My Sights -->
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            padding-top: 80px;
+            /* Space for navbar */
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+
+            /* Fallback color */
+            color: #cbd5e1;
+
+            /* Gradient text */
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        } */
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            height: 360px;
+            /* Fixed height for container */
+            position: relative;
+        }
+
+        .chart-card canvas {
+            max-height: 300px !important;
+            width: 100% !important;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+        }
+
+        .boost-section {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .boost-btn {
+            background: #ffffff;
+            color: #1e3a8a;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .boost-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Subscription Modal */
+        .plan-card {
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .plan-card:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        .plan-card.selected {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <ion-icon name="cellular-outline"></ion-icon>
+            TeleSignal
+        </div>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="my-sights.html" class="active" style="color: var(--primary-color);">My Sights</a></li>
+            <li><a href="operators.html">Operators</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="auth-buttons" id="authContainer">
+            <!-- Logged Out State -->
+            <div id="loggedOutButtons">
+                <a href="login.html" class="btn btn-primary">Login</a>
+                <a href="signup.html" class="btn btn-outline" style="margin-left:10px; display:inline-block;">Sign
+                    Up</a>
+            </div>
+
+            <!-- Logged In State -->
+            <div id="loggedInProfile" style="display: none; align-items: center; gap: 10px;">
+                <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
+            </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-item" onclick="window.location.href='dashboards/user-dashboard.html'">
+                <ion-icon name="grid-outline"></ion-icon> Dashboard
+            </div>
+            <div class="dropdown-item" onclick="window.handleLogout()">
+                <ion-icon name="log-out-outline"></ion-icon> Logout
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-5" style="font-weight: 700;">My Insights – User Behavior & Conversion Analytics</h2>
+
+        <!-- KPIs -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-total-users">--</div>
+                    <div class="kpi-label">Total Users</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-avg-session">--</div>
+                    <div class="kpi-label">Avg Session Time (sec)</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-location-sub">--</div>
+                    <div class="kpi-label">Location Submissions</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-more-clicks">--</div>
+                    <div class="kpi-label">More Clicks (Views)</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-plan-views">--</div>
+                    <div class="kpi-label">Plan Views</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="kpi-get-sim">--</div>
+                    <div class="kpi-label">Get SIM Clicks</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">User Journey Conversion Funnel</div>
+                    <canvas id="chartFunnel"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">Average Session Duration Over Time</div>
+                    <canvas id="chartSessionTrend"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">Daily Sessions Count</div>
+                    <canvas id="chartSessionCount"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">Daily Location Submissions</div>
+                    <canvas id="chartSubmissionsCount"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 3 -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">Operator-wise Plan Views</div>
+                    <canvas id="chartOpPlanViews"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">Operator-wise Get SIM Clicks</div>
+                    <canvas id="chartOpGetSim"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boost Section -->
+        <div class="boost-section">
+            <div>
+                <h3>Partner with TeleSignal</h3>
+                <p class="mb-0" style="opacity: 0.9;">Boost your operator visibility and gain premium insights into user
+                    network preferences.</p>
+            </div>
+            <button class="boost-btn" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
+                <i class="bi bi-rocket-takeoff-fill me-2"></i> Tie up & Boost
+            </button>
+        </div>
+
+    </div>
+
+    <!-- API for Icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Razorpay (Dummy) - Actually loading real script but will use test mode/key -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Subscription Modal -->
+    <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-hidden="true" style="color: #000;">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Boost Plan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-center mb-4 text-muted">Choose a plan to feature your operator and access advanced
+                        analytics.</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="plan-card" onclick="selectPlan(this, 'monthly')">
+                                <h5>Monthly</h5>
+                                <h2 class="text-primary">₹9,999</h2>
+                                <p class="text-muted small">/month</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Basic Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Weekly Reports</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="plan-card selected" onclick="selectPlan(this, 'quarterly')">
+                                <div class="badge bg-warning text-dark mb-2">Most Popular</div>
+                                <h5>Quarterly</h5>
+                                <h2 class="text-primary">₹24,999</h2>
+                                <p class="text-muted small">/3 months</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Priority Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Daily Reports</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Competitor Analysis</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="plan-card" onclick="selectPlan(this, 'yearly')">
+                                <h5>Yearly</h5>
+                                <h2 class="text-primary">₹89,999</h2>
+                                <p class="text-muted small">/year</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li><i class="bi bi-check-lg text-success"></i> Top Placement</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> Real-time Dashboard</li>
+                                    <li><i class="bi bi-check-lg text-success"></i> API Access</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary btn-lg w-100" id="payBtn" onclick="handlePayment()">
+                        Pay ₹24,999 and Boost
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Sights Controller -->
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/my-sights.js"></script>
+    <script>
+        // Global variables for Modal interaction
+        let selectedPlan = 'quarterly';
+        let selectedAmount = 24999;
+
+        function selectPlan(element, plan) {
+            document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedPlan = plan;
+
+            if (plan === 'monthly') selectedAmount = 9999;
+            else if (plan === 'quarterly') selectedAmount = 24999;
+            else selectedAmount = 89999;
+
+            document.getElementById('payBtn').textContent = `Pay ₹${selectedAmount.toLocaleString()} and Boost`;
+        }
+
+        window.handlePayment = function () {
+            // Trigger the module function
+            if (window.initiateRazorpay) {
+                window.initiateRazorpay(selectedAmount, selectedPlan);
+            }
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector(".hamburger");
+            const navMenu = document.querySelector(".nav-links");
+
+            if (hamburger && navMenu) {
+                hamburger.addEventListener("click", () => {
+                    hamburger.classList.toggle("active");
+                    navMenu.classList.toggle("active");
+                });
+
+                document.querySelectorAll(".nav-links li a").forEach(n => n.addEventListener("click", () => {
+                    hamburger.classList.remove("active");
+                    navMenu.classList.remove("active");
+                }));
+            }
+        });
+    </script>
+</body>
+
+</html>

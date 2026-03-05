@@ -1,0 +1,98 @@
+/* Quick Adjust Filter Elements Styling - VIBRANT THEME FIX */
+:root {
+    --theme-blue-glass: rgba(74, 144, 226, 0.15);
+    --theme-accent: #4A90E2;
+    --theme-option-bg: rgba(74, 144, 226, 0.2);
+}
+
+.filter-label {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-transform: uppercase !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+    letter-spacing: 0.5px !important;
+}
+
+.filter-select {
+    background: var(--theme-blue-glass) !important;
+    border: 1px solid rgba(74, 144, 226, 0.3) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+    outline: none !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+.filter-select:focus {
+    border-color: var(--theme-accent) !important;
+    background: rgba(74, 144, 226, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3) !important;
+}
+
+.filter-select-multi {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    color: #fff !important;
+    font-size: 0.9rem !important;
+    outline: none !important;
+    padding: 5px !important;
+}
+
+.filter-select-multi option {
+    padding: 10px 12px !important;
+    background: var(--theme-option-bg) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    margin-bottom: 5px !important;
+    border: 1px solid rgba(74, 144, 226, 0.2) !important;
+    transition: all 0.2s ease !important;
+}
+
+.filter-select-multi option:checked {
+    background: var(--theme-accent) !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.4) !important;
+}
+
+.filter-select-multi option:hover {
+    background: rgba(74, 144, 226, 0.4) !important;
+}
+
+.pincode-list-scroll {
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(74, 144, 226, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 5px !important;
+    margin-top: 10px !important;
+}
+
+/* Scrollbar styling */
+.pincode-list-scroll::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.pincode-list-scroll::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5) !important;
+    border-radius: 10px !important;
+}
+
+/* Theme color fix for Search Pincode box */
+#pincodeSearch {
+    background: var(--theme-blue-glass) !important;
+    border: 1px solid rgba(74, 144, 226, 0.3) !important;
+    color: white !important;
+}
+
+#pincodeSearch:focus {
+    border-color: var(--theme-accent) !important;
+    background: rgba(74, 144, 226, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3) !important;
+}
