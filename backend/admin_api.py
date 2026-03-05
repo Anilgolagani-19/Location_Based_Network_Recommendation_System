@@ -1,16 +1,18 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pandas as pd
+import os
 
 app = Flask(__name__)
 CORS(app)
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATASET_DIR = os.path.join(BASE_DIR, "..", "datasets")
 # Load datasets once when server starts
 DATASETS = {
-    "airtel": pd.read_csv("../datasets/airtel_dataset.csv"),
-    "jio": pd.read_csv("../datasets/jio_dataset.csv"),
-    "vi": pd.read_csv("../datasets/vi_dataset.csv"),
-    "bsnl": pd.read_csv("../datasets/bsnl_dataset.csv")
+    "airtel": pd.read_csv(os.path.join(DATASET_DIR, "airtel_dataset.csv")),
+    "jio": pd.read_csv(os.path.join(DATASET_DIR, "jio_dataset.csv")),
+    "vi": pd.read_csv(os.path.join(DATASET_DIR, "vi_dataset.csv")),
+    "bsnl": pd.read_csv(os.path.join(DATASET_DIR, "bsnl_dataset.csv"))
 }
 
 @app.route("/")
@@ -58,4 +60,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
