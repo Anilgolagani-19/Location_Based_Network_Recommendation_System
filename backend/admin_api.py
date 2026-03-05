@@ -15,9 +15,9 @@ DATASETS = {
     "bsnl": pd.read_csv(os.path.join(DATASET_DIR, "bsnl_dataset.csv"))
 }
 
-# @app.route("/")
-# def home():
-#     return "Admin Data API Running"
+@app.route("/")
+def home():
+    return "Admin Data API Running"
 
 
 @app.route("/customers/<operator>")
