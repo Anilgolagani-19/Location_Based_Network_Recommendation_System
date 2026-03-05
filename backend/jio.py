@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-model_path = os.path.join(os.path.dirname(__file__), "models", "jio_churn.pkl")
+model_path = os.path.join("models", "jio_churn.pkl")
 model = pickle.load(open(model_path, "rb"))
 
 @app.route("/")

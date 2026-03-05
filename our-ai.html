@@ -119,27 +119,9 @@
         }
     </style>
 
-<div id="loginWarning" style="
-display:none;
-text-align:center;
-padding:60px;
-max-width:600px;
-margin:auto;
-">
 
-<h2 style="margin-bottom:20px;">🔒 Login Required</h2>
-
-<p style="margin-bottom:20px;">
-You must be logged in to access the AI Network Prediction.
-</p>
-
-<a href="login.html" class="btn btn-primary">
-Login to Continue
-</a>
-
-</div>
     <!-- OUR AI SECTION -->
-<section class="section" id="aiSection" style="display:none;">
+<section class="section">
     <h1 class="section-title">AI Network Prediction</h1>
 
     <div class="ai-form-card">
@@ -262,13 +244,20 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-  const api = `http://127.0.0.1:10000/predict/${operator.toLowerCase()}`;
+    
 
+const API_BASE =
+    location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:5001"
+        : "https://your-backend-domain.onrender.com";
+
+const api = `${API_BASE}/predict`;
     form.addEventListener("submit", async function(e){
 
         e.preventDefault();
 
         const formData = new FormData(form);
+        formData.append("operator", operator);
 
         resultDiv.style.display = "block";
         resultDiv.innerHTML = `
@@ -282,9 +271,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 method:"POST",
                 body:formData
             });
+            if(!response.ok){
+    throw new Error("Server error");
+}
 
             const data = await response.json();
-
             resultDiv.innerHTML = `
                 <h3>AI Prediction Result</h3>
                 <p><b>Operator:</b> ${data.operator}</p>
@@ -294,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }catch(err){
 
             console.error(err);
-            resultDiv.innerHTML = "⚠️ API server not running";
+            resultDiv.innerHTML = "⚠️  server not running";
 
         }
 
@@ -303,28 +294,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
-
-    <script>
-
-document.addEventListener("DOMContentLoaded", function(){
-
-    const user = localStorage.getItem("userEmail");
-
-    const aiSection = document.getElementById("aiSection");
-    const loginWarning = document.getElementById("loginWarning");
-
-    if(user){
-        aiSection.style.display = "block";
-        loginWarning.style.display = "none";
-    }
-    else{
-        aiSection.style.display = "none";
-        loginWarning.style.display = "block";
-    }
-
-});
-
-</script>
+    
 <script type="module" src="js/auth.js"></script>
-
 </html>

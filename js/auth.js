@@ -76,6 +76,7 @@ function handleAuthRedirect(userEmail) {
     }
 }
 
+
 /**
  * Email/Password Sign Up
  */
@@ -197,24 +198,95 @@ async function triggerGoogleSignIn() {
  * Handle Redirect Result (Special for signInWithRedirect)
  */
 onAuthStateChanged(auth, async (user) => {
-    // Only handle redirect results once
+
+    const isAIPage = window.location.pathname.includes("our-ai.html");
+
+    // 🔒 Protect AI Page
+    if (!user && isAIPage) {
+
+        const popup = document.createElement("div");
+
+       popup.innerHTML = `
+<div style="
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+">
+
+<div style="
+    background:#0f172a;
+    padding:35px;
+    border-radius:14px;
+    text-align:center;
+    color:white;
+    max-width:380px;
+    width:90%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+">
+<h3 style="margin-bottom:10px;">Login Required</h3>
+
+<p style="opacity:0.8">
+You must login to access AI Network Prediction.
+</p>
+
+<button id="goLoginBtn" style="
+margin-top:18px;
+padding:10px 22px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+color:white;
+font-weight:600;
+cursor:pointer;
+">
+Login Now
+</button>
+
+</div>
+</div>
+`;
+document.body.style.pointerEvents = "none";
+popup.style.pointerEvents = "auto";
+        document.body.appendChild(popup);
+
+        document.getElementById("goLoginBtn").onclick = () => {
+            window.location.href = "login.html";
+        };
+
+        return;
+    }
+
+    // Handle Google Redirect Result
     if (user && !localStorage.getItem('userLoggedIn')) {
         try {
             const result = await getRedirectResult(auth);
+
             if (result) {
-                const user = result.user;
-                await setDoc(doc(db, "users", user.uid), {
-                    name: user.displayName,
-                    email: user.email,
+                const gUser = result.user;
+
+                await setDoc(doc(db, "users", gUser.uid), {
+                    name: gUser.displayName,
+                    email: gUser.email,
                     lastLogin: new Date(),
-                    uid: user.uid
+                    uid: gUser.uid
                 }, { merge: true });
-                handleAuthRedirect(user.email);
+
+                handleAuthRedirect(gUser.email);
             }
+
         } catch (err) {
             console.error("[Auth] Redirect Error:", err);
         }
     }
+
 });
 
 if (elements.googleLoginBtn) elements.googleLoginBtn.addEventListener('click', triggerGoogleSignIn);
@@ -248,7 +320,7 @@ window.handleLogout = async function () {
     }
 };
 
-/**
+/**const isAIPage = window.lo
  * Auth State Listener & Profile Sync
  */
 /**

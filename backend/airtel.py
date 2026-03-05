@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load model
-model_path = os.path.join(os.path.dirname(__file__), "models", "airtel_churn.pkl")
+model_path = os.path.join("models", "airtel_churn.pkl")
 loaded = pickle.load(open(model_path, "rb"))
 
 model = loaded["model"]
