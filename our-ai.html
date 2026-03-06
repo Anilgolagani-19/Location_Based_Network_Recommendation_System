@@ -233,39 +233,41 @@ text-align:center;
 
 <script>
 
-    const email = localStorage.getItem("userEmail");
+const email = localStorage.getItem("userEmail");
+console.log("[Auth] Stored Email:", email);
 
 if(email === "manikanta25632563@gmail.com"){
     alert("Admins cannot access AI prediction.");
     window.location.href = "dashboards/admin-dashboard.html";
 }
+
 document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("[System] DOM Loaded");
+
+    const operator = localStorage.getItem("userOperator")?.toLowerCase();
+    
+    console.log("[System] Operator from LocalStorage:", operator);
 
     const form = document.getElementById("predictionForm");
     const resultDiv = document.getElementById("predictionResult");
 
-    // Hide AI navbar for admin
-    const aiNav = document.getElementById("aiNav");
-    if(role === "admin" && aiNav){
-        aiNav.style.display = "none";
-    }
-
-    // If user but operator missing
-    if(role === "user" && !operator){
-        alert("Operator not found.");
-        window.location.href = "login.html";
-        return;
-    }
-
     const API_BASE ="https://location-based-network-recommendation.onrender.com";
     const api = `${API_BASE}/predict`;
+
+    console.log("[System] API Endpoint:", api);
 
     form.addEventListener("submit", async function(e){
 
         e.preventDefault();
+        console.log("[Form] Form Submitted");
 
         const formData = new FormData(form);
         formData.append("operator", operator);
+
+        console.log("[Form] Data Being Sent:",
+            Object.fromEntries(formData.entries())
+        );
 
         resultDiv.style.display = "block";
         resultDiv.innerHTML = `
@@ -273,18 +275,60 @@ document.addEventListener("DOMContentLoaded", function () {
             <p>Analyzing Network Performance...</p>
         `;
 
+        const wakeupTimer = setTimeout(()=>{
+            resultDiv.innerHTML = `
+                <div class="spinner"></div>
+                <p>Server waking up... please wait</p>
+            `;
+        },5000);
+
         try{
+
+            console.log("[API] Sending request to server...");
+
+            const controller = new AbortController();
+
+            const timeout = setTimeout(()=>{
+                controller.abort();
+            },15000);
+
+            const startTime = Date.now();
 
             const response = await fetch(api,{
                 method:"POST",
-                body:formData
+                body: formData,
+                signal: controller.signal
             });
 
-            if(!response.ok){
-                throw new Error("Server error");
+            clearTimeout(timeout);
+            clearTimeout(wakeupTimer);
+
+            const endTime = Date.now();
+            console.log("[API] Response received in", (endTime-startTime),"ms");
+
+            console.log("[API] Status:", response.status);
+
+            const rawText = await response.text();
+            console.log("[API] Raw Response:", rawText);
+
+            let data;
+
+            try{
+                data = JSON.parse(rawText);
+                console.log("[API] Parsed JSON:", data);
+            }
+            catch(err){
+                throw new Error("Invalid JSON returned by server");
             }
 
-            const data = await response.json();
+            if(!response.ok){
+
+                resultDiv.innerHTML = `
+                    ⚠️ Prediction failed<br>
+                    Reason: ${data.error}
+                `;
+                return;
+            }
 
             resultDiv.innerHTML = `
                 <h3>AI Prediction Result</h3>
@@ -292,10 +336,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><b>Prediction:</b> ${data.prediction}</p>
             `;
 
-        }catch(err){
+        }
+        catch(err){
 
-            console.error(err);
-            resultDiv.innerHTML = "⚠️ server not running";
+            console.error("[Error]", err);
+
+            if(err.name === "AbortError"){
+                resultDiv.innerHTML = `
+                    ⚠️ Server timeout.<br>
+                    Backend may be sleeping.
+                `;
+            }else{
+                resultDiv.innerHTML = `
+                    ⚠️ Could not contact server.<br>
+                    Check console for details.
+                `;
+            }
 
         }
 

@@ -534,17 +534,7 @@ function parseAuthError(code) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const role = localStorage.getItem("userRole");
-    const aiNav = document.getElementById("aiNav");
-
-    // If admin logged in → hide Our AI
-    if(role === "admin" && aiNav){
-        aiNav.style.display = "none";
-    }
-
-});
+// q
 
 document.addEventListener("DOMContentLoaded", function () {
 
