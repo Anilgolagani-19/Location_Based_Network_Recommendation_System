@@ -15,7 +15,7 @@
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="features.html">Features</a></li>
-            <li><a href="our-ai.html" class="active">Our AI</a></li>
+<li id="aiNav"><a href="our-ai.html">Our AI</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact</a></li>
         </ul>
@@ -233,22 +233,33 @@ text-align:center;
 
 <script>
 
+    const email = localStorage.getItem("userEmail");
+
+if(email === "manikanta25632563@gmail.com"){
+    alert("Admins cannot access AI prediction.");
+    window.location.href = "dashboards/admin-dashboard.html";
+}
 document.addEventListener("DOMContentLoaded", function () {
 
-    const operator = localStorage.getItem("userOperator");
     const form = document.getElementById("predictionForm");
     const resultDiv = document.getElementById("predictionResult");
 
-    if(!operator){
-        alert("Operator not found. Please login again.");
+    // Hide AI navbar for admin
+    const aiNav = document.getElementById("aiNav");
+    if(role === "admin" && aiNav){
+        aiNav.style.display = "none";
+    }
+
+    // If user but operator missing
+    if(role === "user" && !operator){
+        alert("Operator not found.");
+        window.location.href = "login.html";
         return;
     }
 
-    
+    const API_BASE ="https://location-based-network-recommendation.onrender.com";
+    const api = `${API_BASE}/predict`;
 
-const API_BASE ="https://location-based-network-recommendation.onrender.com"; // Update with your backend URL
-
-const api = `${API_BASE}/predict`;
     form.addEventListener("submit", async function(e){
 
         e.preventDefault();
@@ -268,11 +279,13 @@ const api = `${API_BASE}/predict`;
                 method:"POST",
                 body:formData
             });
+
             if(!response.ok){
-    throw new Error("Server error");
-}
+                throw new Error("Server error");
+            }
 
             const data = await response.json();
+
             resultDiv.innerHTML = `
                 <h3>AI Prediction Result</h3>
                 <p><b>Operator:</b> ${data.operator}</p>
@@ -282,14 +295,13 @@ const api = `${API_BASE}/predict`;
         }catch(err){
 
             console.error(err);
-            resultDiv.innerHTML = "⚠️  server not running";
+            resultDiv.innerHTML = "⚠️ server not running";
 
         }
 
     });
 
 });
-
 </script>
     
 <script type="module" src="js/auth.js"></script>

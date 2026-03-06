@@ -533,3 +533,31 @@ function parseAuthError(code) {
         default: return "Authentication failed. See console.";
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const role = localStorage.getItem("userRole");
+    const aiNav = document.getElementById("aiNav");
+
+    // If admin logged in → hide Our AI
+    if(role === "admin" && aiNav){
+        aiNav.style.display = "none";
+    }
+
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const aiNav = document.getElementById("aiNav");
+    const email = localStorage.getItem("userEmail");
+
+    if(!email) return;
+
+    const isAdmin = email === "manikanta25632563@gmail.com";
+    const isOperator = email === "operators@gmail.com";
+
+    if(isAdmin || isOperator){
+        if(aiNav) aiNav.style.display = "none";
+    }
+
+});
