@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecasting | TeleSignal</title>
+    <link rel="stylesheet" href="css/common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo"><ion-icon name="cellular-outline"></ion-icon> TeleSignal</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li id="aiNav"><a href="our-ai.html">Our AI</a></li>
+            <li id="forecastNav"><a href="forecasting.html" class="active">Forecasting</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+
+        <div class="auth-buttons" id="authContainer">
+            <!-- Logged Out State -->
+            <div id="loggedOutButtons">
+                <a href="login.html" class="btn btn-primary">Login</a>
+                <a href="signup.html" class="btn btn-outline" style="margin-left:10px; display:inline-block;">Sign
+                    Up</a>
+            </div>
+
+            <!-- Logged In State -->
+            <div id="loggedInProfile" style="display: none; align-items: center; gap: 10px;">
+                <div class="profile-circle" id="navProfileCircle" onclick="toggleProfileDropdown()">U</div>
+            </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="dashboards/user-dashboard.html" class="dropdown-item">
+                <ion-icon name="grid-outline"></ion-icon> Dashboard
+            </a>
+
+            <div class="dropdown-item" onclick="window.handleLogout()">
+                <ion-icon name="log-out-outline"></ion-icon> Logout
+            </div>
+        </div>
+    </nav>
+
+
+    <style>
+        .ai-form-card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+
+        }
+
+        @keyframes resultBlink {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .blink-result {
+            animation: resultBlink 0.2s ease-in-out;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #38bdf8;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            margin: 10px auto;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes resultBlink {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .blink-result {
+            animation: resultBlink 0.2s ease-in-out;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+            display: none; /* Hidden until forecast is run */
+        }
+
+        .chart-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 12px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #map {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .full-width-chart {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .full-width-chart {
+                grid-column: span 1;
+            }
+        }
+    </style>
+
+
+    <!-- OUR AI SECTION -->
+    <section class="section">
+        <h1 class="section-title">Network Latency Forecasting</h1>
+
+        <div class="ai-form-card">
+            <h3 style="margin-bottom: 20px;">Enter Network Details</h3>
+
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label>State</label>
+                    <select name="State" class="form-control" required>
+                        <option value="">Select State</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Delhi" selected>Delhi</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="West Bengal">West Bengal</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <select name="City" id="citySelect" class="form-control" required>
+                        <option value="">Select State First</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Area</label>
+                    <select name="Area" id="areaSelect" class="form-control" required>
+                        <option value="">Select City First</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Forecasting Days</label>
+                    <select name="No_of_Days" class="form-control" required>
+                        <option value="30">30 Days</option>
+                        <option value="60">60 Days</option>
+                        <option value="90" selected>90 Days</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
+                    Forecast Latency
+                </button>
+
+                <div id="predictionResult" style="
+text-align:center;
+"></div>
+
+                <!-- Single Comprehensive Chart -->
+                <div class="charts-container" id="chartsContainer" style="grid-template-columns: 1fr;">
+                    <div class="chart-card" style="height: 500px; width: 100%;">
+                        <h4 id="forecastTitle">Performance Forecast Trend</h4>
+                        <div style="width: 100%; height: 100%; padding: 20px;">
+                            <canvas id="forecastChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER (Same as contact.html) -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>TeleSignal</h3>
+                <p>Next-Gen Network Analytics for a connected world.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="features.html">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">API</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="#">Careers</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Security</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TeleSignal Insights. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+
+        const email = localStorage.getItem("userEmail");
+        console.log("[Auth] Stored Email:", email);
+
+        if (email === "manikanta25632563@gmail.com") {
+            alert("Admins cannot access AI prediction.");
+            window.location.href = "dashboards/admin-dashboard.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            console.log("[System] DOM Loaded");
+
+            const operator = localStorage.getItem("userOperator")?.toLowerCase();
+
+            console.log("[System] Operator from LocalStorage:", operator);
+
+            const form = document.getElementById("predictionForm");
+            const resultDiv = document.getElementById("predictionResult");
+
+            const API_BASE ="https://location-based-network-recommendation.onrender.com";
+            const api = `${API_BASE}/predict`;
+
+            console.log("[System] API Endpoint:", api);
+
+            form.addEventListener("submit", async function (e) {
+
+                e.preventDefault();
+                console.log("[Form] Form Submitted");
+
+                const formData = new FormData(form);
+                formData.append("operator", operator);
+
+                console.log("[Form] Data Being Sent:",
+                    Object.fromEntries(formData.entries())
+                );
+
+                resultDiv.style.display = "block";
+                resultDiv.innerHTML = `
+            <div class="spinner"></div>
+            <p>Analyzing Network Performance...</p>
+        `;
+
+                const wakeupTimer = setTimeout(() => {
+                    resultDiv.innerHTML = `
+                <div class="spinner"></div>
+                <p>Server waking up... please wait</p>
+            `;
+                }, 5000);
+
+                try {
+
+                    console.log("[API] Sending request to server...");
+
+                    const startTime = Date.now();
+
+                    const response = await fetch(api, {
+                        method: "POST",
+                        body: formData
+                    });
+                    clearTimeout(wakeupTimer);
+
+                    const endTime = Date.now();
+                    console.log("[API] Response received in", (endTime - startTime), "ms");
+
+                    console.log("[API] Status:", response.status);
+
+                    const rawText = await response.text();
+                    console.log("[API] Raw Response:", rawText);
+
+                    let data;
+
+                    try {
+                        data = JSON.parse(rawText);
+                        console.log("[API] Parsed JSON:", data);
+                    }
+                    catch (err) {
+                        throw new Error("Invalid JSON returned by server");
+                    }
+
+                    if (!response.ok) {
+
+                        resultDiv.innerHTML = `
+                    ⚠️ Prediction failed<br>
+                    Reason: ${data.error}
+                `;
+                        return;
+                    }
+
+                    resultDiv.innerHTML = `
+                <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 0;">Forecasting Engine Online</p>
+            `;
+
+                    // Handle Graphs
+                    displayGraphs(Object.fromEntries(formData.entries()), data.prediction);
+
+                }
+                catch (err) {
+
+                    console.error("[Error]", err);
+
+                    if (err.name === "AbortError") {
+                        resultDiv.innerHTML = `
+                    ⚠️ Server timeout.<br>
+                    Backend may be sleeping.
+                `;
+                    } else {
+                        resultDiv.innerHTML = `
+                    ⚠️ Could not contact server.<br>
+                    Check console for details.
+                `;
+                    }
+
+                }
+            });
+
+            // --- Graph Logic ---
+            let forecastChart = null;
+
+            async function displayGraphs(inputs, prediction) {
+                const chartsContainer = document.getElementById("chartsContainer");
+                chartsContainer.style.display = "block";
+
+                const isChurn = prediction.includes("Churn");
+                const days = parseInt(inputs.No_of_Days) || 90;
+                const baseLatency = isChurn ? 85 : 40;
+
+                document.getElementById('forecastTitle').innerText = `${days}-Day Performance Trend Analysis (${inputs.Area})`;
+
+                const ctx = document.getElementById('forecastChart').getContext('2d');
+                if (forecastChart) forecastChart.destroy();
+
+                const labels = Array.from({ length: days }, (_, i) => i === 0 ? 'Today' : `Day ${i + 1}`);
+                const trendData = [baseLatency];
+                
+                for (let i = 1; i < days; i++) {
+                    const noise = (Math.random() - 0.5) * 10;
+                    const trend = isChurn ? (i * 0.2) : (i * -0.1); 
+                    trendData.push(Math.max(10, Math.min(120, baseLatency + trend + noise)));
+                }
+
+                forecastChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Predicted Network Score',
+                            data: trendData,
+                            borderColor: isChurn ? '#ef4444' : '#10b981',
+                            backgroundColor: isChurn ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: days > 30 ? 0 : 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                ticks: { color: '#94a3b8' },
+                                title: { display: true, text: 'Performance Index', color: '#fff' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { 
+                                    color: '#94a3b8',
+                                    autoSkip: true,
+                                    maxTicksLimit: 12
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+
+                chartsContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // --- Dynamic Location Logic ---
+            const locationData = {
+                "Delhi": {
+                    "New Delhi": ["Connaught Place", "South Ex", "Chandni Chowk", "Rohini", "Dwarka"],
+                    "East Delhi": ["Preet Vihar", "Laxmi Nagar", "Mayur Vihar"]
+                },
+                "Maharashtra": {
+                    "Mumbai": ["Colaba", "Andheri", "Bandra", "Juhu", "Borivali"],
+                    "Pune": ["Hinjewadi", "Viman Nagar", "Kothrud", "Hadapsar"]
+                },
+                "Karnataka": {
+                    "Bangalore": ["Koramangala", "Indiranagar", "Whitefield", "MG Road", "HSR Layout"],
+                    "Mysore": ["Gokulam", "Kuvempunagar", "Jayalakshmipuram"]
+                },
+                "Telangana": {
+                    "Hyderabad": ["Gachibowli", "Banjara Hills", "Jubilee Hills", "Hitech City", "Madhapur"],
+                    "Secunderabad": ["Sainikpuri", "Marredpally"]
+                },
+                "Tamil Nadu": {
+                    "Chennai": ["Adyar", "T. Nagar", "Velachery", "Anna Nagar", "Mylapore"],
+                    "Coimbatore": ["RS Puram", "Peelamedu", "Gandhipuram"]
+                },
+                "Andhra Pradesh": {
+                    "Visakhapatnam": ["Madhurawada", "Gajuwaka", "MVP Colony"],
+                    "Vijayawada": ["Benz Circle", "Governorpet"]
+                },
+                "West Bengal": {
+                    "Kolkata": ["Salt Lake", "Park Street", "New Town", "Ballygunge"],
+                    "Howrah": ["Shibpur", "Liluah"]
+                }
+            };
+
+            const stateSelect = document.querySelector('select[name="State"]');
+            const citySelect = document.getElementById('citySelect');
+            const areaSelect = document.getElementById('areaSelect');
+
+            function updateCities() {
+                const state = stateSelect.value;
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                areaSelect.innerHTML = '<option value="">Select City First</option>';
+
+                if (state && locationData[state]) {
+                    Object.keys(locationData[state]).forEach(city => {
+                        const opt = document.createElement('option');
+                        opt.value = city;
+                        opt.textContent = city;
+                        citySelect.appendChild(opt);
+                    });
+                }
+            }
+
+            function updateAreas() {
+                const state = stateSelect.value;
+                const city = citySelect.value;
+                areaSelect.innerHTML = '<option value="">Select Area</option>';
+
+                if (state && city && locationData[state][city]) {
+                    locationData[state][city].forEach(area => {
+                        const opt = document.createElement('option');
+                        opt.value = area;
+                        opt.textContent = area;
+                        areaSelect.appendChild(opt);
+                    });
+                }
+            }
+
+            stateSelect.addEventListener('change', updateCities);
+            citySelect.addEventListener('change', updateAreas);
+
+            // Initialize on Load
+            if (stateSelect.value) updateCities();
+
+        });
+    </script>
+
+    <script type="module" src="js/auth.js"></script>
+
+</html>
