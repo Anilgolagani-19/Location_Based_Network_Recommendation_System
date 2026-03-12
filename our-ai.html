@@ -132,8 +132,8 @@
                 <div class="form-group">
                 <label>Network Type</label>
                 <select name="Network_type" class="form-control" required>
-                    <option value="">Select</option>
-                    <option value="4G">4G</option>
+                    
+                    <option value="4G" selected >4G</option>
                     <option value="5G">5G</option>
                 </select>
             </div>
@@ -154,37 +154,66 @@
 
             <div class="form-group">
                 <label>Signal Strength (dBm)</label>
-                <input type="number" name="Signal_strength_dBm" class="form-control" required>
+                <input type="number" name="Signal_strength_dBm" class="form-control" value="-70" required>
             </div>
 
             <div class="form-group">
-                <label>No. of Issues Resolved</label>
-                <input type="number" name="No_of_Issues_Resolved" class="form-control" required>
-            </div>
+<label>No. of Issues Resolved</label>
+<select name="No_of_Issues_Resolved" class="form-control" required>
+<option value="0">0 Issues</option>
+<option value="1">1 - 2 Issues</option>
+<option value="2">3 - 4 Issues</option>
+<option value="3">4 - 5 Issues</option>
+<option value="4">5+ Issues</option>
+</select>
+</div>
 
             <div class="form-group">
                 <label>Plan Type</label>
                 <select name="Plan_Type" class="form-control" required>
-                    <option value="">Select</option>
-                    <option value="Monthly Plan">Monthly Plan</option>
+                    
+                    <option value="Monthly Plan" selected >Monthly Plan</option>
                     <option value="3 Months Plan">3 Months Plan</option>
                     <option value="Yearly Plan">Yearly Plan</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Months Active</label>
-                <input type="number" name="Months_Active" class="form-control" required>
-            </div>
+<label>Months Active</label>
+<select name="Months_Active" class="form-control" required>
+
+<option value="3">0 – 3 Months</option>
+<option value="6">3 – 6 Months</option>
+<option value="12" selected>6 – 12 Months</option>
+<option value="18">1 – 1.5 Years</option>
+<option value="24">1.5 – 2 Years</option>
+<option value="36">2+ Years</option>
+</select>
+</div>
 
             <div class="form-group">
                 <label>Latency Range</label>
-                <input type="number" name="Latency_Score" class="form-control" required>
+                <input type="number" name="Latency_Score" class="form-control"  value="30 " required>
             </div>
 
      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
     Predict Performance
 </button>
+<div id="churnReasons" style="
+display:none;
+margin-top:20px;
+padding:15px;
+border-radius:10px;
+background:#1e293b;
+color:white;
+">
+
+<h3>Major Possible Reasons for Churn:</h3>
+
+
+<ul id="reasonList"></ul>
+
+</div>
 
 <div id="predictionResult" style="
 display:none;
@@ -246,18 +275,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("[System] DOM Loaded");
 
+    const API_BASE = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:5000"
+        : "https://location-based-network-recommendation.onrender.com";
+
+    const api = `${API_BASE}/predict`;
+
+    // Auto wake server
+    fetch(api).catch(()=>{});
+
+    console.log("[System] API Endpoint:", api);
+
+    console.log("[System] DOM Loaded");
+
     const operator = localStorage.getItem("userOperator")?.toLowerCase();
     
     console.log("[System] Operator from LocalStorage:", operator);
 
     const form = document.getElementById("predictionForm");
     const resultDiv = document.getElementById("predictionResult");
-
-    const API_BASE = location.hostname === "localhost" || location.hostname === "127.0.0.1"
-    ? "http://127.0.0.1:5001"
-    : "https://location-based-network-recommendation.onrender.com";
-    const api = `${API_BASE}/predict`;
-
     console.log("[System] API Endpoint:", api);
 
     form.addEventListener("submit", async function(e){
@@ -283,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="spinner"></div>
                 <p>Server waking up... please wait</p>
             `;
-        },5000);
+        },2000);
 
         try{
 
@@ -324,11 +360,55 @@ const response = await fetch(api,{
                 return;
             }
 
-            resultDiv.innerHTML = `
-                <h3>AI Prediction Result</h3>
-                <p><b>Operator:</b> ${data.operator}</p>
-                <p><b>Prediction:</b> ${data.prediction}</p>
-            `;
+            const reasonsDiv = document.getElementById("churnReasons");
+const reasonList = document.getElementById("reasonList");
+
+resultDiv.innerHTML = `
+<h3>AI Prediction Result</h3>
+<p><b>Operator:</b> ${data.operator}</p>
+<p><b>Prediction:</b> ${data.prediction}</p>
+`;
+
+reasonList.innerHTML = "";
+reasonsDiv.style.display = "none";
+const predictionText = data.prediction.toLowerCase();
+
+if(
+predictionText.includes("risk") ||
+predictionText.includes("leave")
+){
+
+reasonsDiv.style.display = "block";
+resultDiv.classList.add("blink-result");
+
+let reasons = [];
+
+const signal = formData.get("Signal_strength_dBm");
+const latency = formData.get("Latency_Score");
+const issues = formData.get("No_of_Issues_Resolved");
+
+if(signal < -85)
+reasons.push("Weak signal strength detected in your area.");
+
+if(latency > 80)
+reasons.push("High network latency affecting performance.");
+
+if(issues > 3)
+reasons.push("Frequent service issues reported.");
+
+if(formData.get("Months_Active") < 6)
+reasons.push("Customer is relatively new and may switch operators.");
+
+if(reasons.length === 0)
+reasons.push("General service dissatisfaction or better competitor offers.");
+
+reasons.forEach(r=>{
+const li = document.createElement("li");
+li.textContent = r;
+reasonList.appendChild(li);
+});
+
+}
 
         }
         catch(err){
